@@ -43,7 +43,7 @@ data:
     [
       {
         "name": "build-reports",
-        "image": "registry.lokalhost.net/fresh2dev/docker:0.0.3",
+        "image": "registry.lokalhost.net/fresh2dev/docker:0.0.4",
         "commands": [
           "myke requirements",
           "myke reports"
@@ -56,20 +56,21 @@ data:
     [
       {
         "name": "py-build-package",
-        "image": "registry.lokalhost.net/fresh2dev/docker:0.0.3",
+        "image": "registry.lokalhost.net/fresh2dev/docker:0.0.4",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"}
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
+          "myke set-version --repository lokalhost",
           "myke requirements -e build",
-          "myke build --repository lokalhost"
+          "myke build"
         ],
         "when": {}
       },
       {
         "name": "py-publish-dev",
-        "image": "registry.lokalhost.net/fresh2dev/docker:0.0.3",
+        "image": "registry.lokalhost.net/fresh2dev/docker:0.0.4",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
           "TWINE_CERT": "/etc/ssl/certs/ca-certificates.crt"
@@ -85,7 +86,7 @@ data:
       },
       {
         "name": "py-publish-test",
-        "image": "registry.lokalhost.net/fresh2dev/docker:0.0.3",
+        "image": "registry.lokalhost.net/fresh2dev/docker:0.0.4",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
           "TWINE_CERT": "/etc/ssl/certs/ca-certificates.crt"
@@ -101,7 +102,7 @@ data:
       },
       {
         "name": "py-publish-prod",
-        "image": "registry.lokalhost.net/fresh2dev/docker:0.0.3",
+        "image": "registry.lokalhost.net/fresh2dev/docker:0.0.4",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
           "TWINE_CERT": "/etc/ssl/certs/ca-certificates.crt"
