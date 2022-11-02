@@ -1,0 +1,8 @@
+
+[arrival]
+hello = "world"
+
+[departure]
+goodbye = "cruel world"
+
+# comment

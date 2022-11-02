@@ -1,0 +1,138 @@
+#!/usr/bin/env python3
+# type: ignore
+
+import os
+from typing import List, Set, Tuple
+
+import myke
+
+
+@myke.task(root=True)
+def setup():
+    """
+
+    hello world
+
+    """
+    print("charging lazer beamz")
+
+
+@myke.task
+def hello(name="world"):
+    """Say hello."""
+    print("hello " + name)
+
+
+@myke.task(name="hello-named")
+def halo(name="world"):
+    print("hello " + name)
+
+
+@myke.task
+def x_hello_named2(name="world"):
+    print("hello " + name)
+
+
+@myke.task
+def x_hello_named3(name="world"):
+    print("hello " + name)
+
+
+@myke.task
+def x_hello_positional(name=myke.arg("world", pos=True)):
+    print("hello " + name)
+
+
+@myke.task
+def x_hello_positional_bool(upper: bool = myke.arg(default=False, pos=True)):
+    txt: str = "hello world"
+    if upper:
+        txt = txt.upper()
+    print(txt)
+
+
+@myke.task_sh
+def hello_sh(name="world"):
+    return f"""
+        echo hello {name}
+
+        echo
+
+        echo woohoo
+    """
+
+
+@myke.task_sh_stdout_lines(echo=True)
+def hello_sh_stdout(name="world"):
+    return f"""
+        echo '   hello {name}   '
+        echo
+        echo
+
+        echo woohoo
+        echo
+    """
+
+
+@myke.task
+def hello_depends(name="world"):
+    output: List[str] = hello_sh_stdout(name)
+    assert len(output) == 2
+    assert output[0] == f"hello {name}"
+    assert output[1] == "woohoo"
+
+
+@myke.task_sh_stdout(env={"NAME": "donald"}, echo=True)
+def hello_env():
+    return 'echo "hello $NAME"'
+
+
+@myke.task_sh_stdout(echo=True)
+def hello_env2():
+    return 'echo "hello $NAME"'
+
+
+@myke.task_sh_stdout(env_update={"NAME": "donald"}, echo=True)
+def hello_env_update():
+    return 'echo "hello $NAME"'
+
+
+@myke.task_sh
+def hello_check():
+    return "exit 123"
+
+
+@myke.task_sh(timeout=1)
+def hello_timeout():
+    return "sleep 2s"
+
+
+@myke.task
+def assert_types(
+    xstr,
+    xint: int,
+    xfloat: float,
+    xbool: bool,
+    xliststr: List[str],
+    xsetint: Set[int],
+    xtuplefloat: Tuple[float, ...],
+) -> None:
+    assert isinstance(xstr, str)
+    assert isinstance(xint, int)
+    assert isinstance(xfloat, float)
+    assert isinstance(xbool, bool)
+    assert isinstance(xliststr, list)
+    assert isinstance(xliststr[0], str)
+    assert isinstance(xsetint, set)
+    assert isinstance(list(xsetint)[0], int)
+    assert isinstance(xtuplefloat, tuple)
+    assert isinstance(xtuplefloat[0], float)
+
+
+dir_name: str = os.path.dirname(__name__)
+other_myke: str = os.path.join(dir_name, "otherMykefile")
+
+myke.import_module(other_myke)
+
+if __name__ == "__main__":
+    myke.main(__file__)

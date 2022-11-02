@@ -1,0 +1,10 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: dd25110
+_src_path: https://fresh2.dev/code/r/copier-python.git
+author_email: hello@fresh2.dev
+author_name: donald
+ci_domain_name: lokalhost.net
+package_name: myke
+project_name: myke
+public_url: https://www.fresh2.dev/code/r/myke
+python_version: '3.7'
