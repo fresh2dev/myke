@@ -40,6 +40,12 @@ def main(_file: Optional[str] = None) -> None:
             env_var="MYKE_ENV_FILE",
             group="myke args",
         )
+        update_modules: bool = yapx.arg(
+            default=False,
+            flags=["--myke-update-modules"],
+            env_var="MYKE_UPDATE_MODULES",
+            group="myke args",
+        )
         no_pydantic: bool = yapx.arg(
             default=False, group="myke args", flags=["--myke-no-pydantic"]
         )
@@ -85,6 +91,9 @@ def main(_file: Optional[str] = None) -> None:
 
     if myke_args.env_file:
         os.environ.update(read.envfile(myke_args.env_file))
+
+    if myke_args.update_modules:
+        os.environ["MYKE_UPDATE_MODULES"] = "1"
 
     if _file:
         if not os.path.exists(_file):

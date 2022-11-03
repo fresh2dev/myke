@@ -40,7 +40,7 @@ def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
         TASKS[k] = v
 
 
-def import_module(*mykefiles: str, overwrite: bool = False) -> None:
+def import_module(*mykefiles: str, overwrite: Optional[bool] = None) -> None:
     n_tasks_before: int = len(TASKS)
     for m in mykefiles:
         if m.startswith("https://"):
@@ -62,9 +62,12 @@ def import_module(*mykefiles: str, overwrite: bool = False) -> None:
 def install_module(
     url: str,
     path: Optional[str] = None,
-    if_not_exists: bool = True,
-    overwrite: bool = False,
+    fail_if_exists: Optional[bool] = None,
+    overwrite: Optional[bool] = None,
 ) -> str:
+    if overwrite is None:
+        overwrite = bool(os.getenv("MYKE_UPDATE_MODULES"))
+
     if not url.startswith("https://"):
         raise ValueError("Download URLs must start with 'https://'")
 
@@ -76,7 +79,7 @@ def install_module(
 
         path = os.path.join(path, os.path.basename(url))
 
-    if not overwrite and os.path.exists(path) and if_not_exists:
+    if not overwrite and not fail_if_exists and os.path.exists(path):
         return path
 
     resp_text: str = read.url(url)
