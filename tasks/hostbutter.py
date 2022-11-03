@@ -1,8 +1,22 @@
 #!/usr/bin/env python3
 
+import os
 from typing import Dict, Optional
 
 import myke
+
+replace_prefix: str = "DRONE"
+replace_with: str = "CI"
+for k in list(os.environ.keys()):
+    if k.startswith(replace_prefix):
+        new_k: str = k.replace(replace_prefix, replace_with, 1)
+        if new_k not in os.environ:
+            os.environ[new_k] = os.environ[k]
+
+more_alternatives: Dict[str, str] = {"CI_TAG": "CI_COMMIT_TAG"}
+for k, v in more_alternatives.items():
+    if k in os.environ and v not in os.environ:
+        os.environ[v] = os.environ[k]
 
 
 @myke.task_sh

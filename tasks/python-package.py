@@ -54,9 +54,7 @@ def _get_next_version(
             else:
                 version = "0.0.1a1"
 
-    _dev_version = bool(os.getenv("CI_COMMIT_SHA")) and not bool(
-        os.getenv("CI_COMMIT_TAG")
-    )
+    _dev_version = os.getenv("CI") and not os.getenv("CI_COMMIT_TAG")
 
     if _dev_version:
         ver_published: List[str] = x_find_published_versions(
@@ -220,7 +218,7 @@ def x_find_published_versions(
         )
 
     values: List[str] = myke.sh_stdout_lines(
-        f"pip install {pip_args} {name}== 2>&1"
+        f"pip install --disable-pip-version-check {pip_args} {name}== 2>&1"
         r" | tr ' ' '\n' | tr -d ',' | tr -d ')' | grep '^v\?[[:digit:]]'"
         r" || true"
     )
