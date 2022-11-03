@@ -129,6 +129,7 @@ def x_set_version(
 def x_clean():
     return r"""
 rm -rf dist build public src/*.egg-info .mypy_cache .pytest_cache .coverage .hypothesis .tox
+find . -type f -name "*.rej" -delete
 find . -type d -name "__pycache__" | xargs -r rm -rf
 """
 
@@ -342,19 +343,23 @@ python -m pdoc -o {REPORT_DIR}/srcdocs --docformat google --search --show-source
 
     myke.sh(r"mkdocs build --clean --config-file config/mkdocs.yml")
 
-
-#     return f"""
-# echo "<h1>${{DRONE_REPO_NAME}}</h1>" > {REPORT_DIR}/index.html
-# echo "<h2>Reports:</h2>" >> {REPORT_DIR}/index.html
-# echo '<ul style="font-size: 1.5em">' >> {REPORT_DIR}/index.html
-# find {REPORT_DIR} -mindepth 1 -maxdepth 1 -type d | sort | while read -r dir; do \
-#     BASE_DIR="$(basename "${{dir}}")" \
-#     && echo "<li><a href='${{BASE_DIR}}/' target='_blank'>${{BASE_DIR}}</a></li>" >> {REPORT_DIR}/index.html; \
-#   done
-# echo '</ul>' >> {REPORT_DIR}/index.html
-# echo "<p>Ref: ${{DRONE_COMMIT}}</p>" >> {REPORT_DIR}/index.html
-# echo "<p>Timestamp: ${{DRONE_BUILD_STARTED}}</p>" >> {REPORT_DIR}/index.html
-# """
+    myke.sh(
+        r"""
+echo "<h1>{CI_REPO_NAME}</h1>" > {REPORT_DIR}/index.html
+echo "<h2>Reports:</h2>" >> {REPORT_DIR}/index.html
+echo '<ul style="font-size: 1.5em">' >> {REPORT_DIR}/index.html
+find {REPORT_DIR} -mindepth 1 -maxdepth 1 -type d | sort | while read -r dir; do \
+    BASE_DIR="$(basename "$dir")" \
+    && echo "<li><a href='$BASE_DIR/' target='_blank'>$BASE_DIR</a></li>" >> {REPORT_DIR}/index.html; \
+  done
+echo '</ul>' >> {REPORT_DIR}/index.html
+echo "<p>Ref: {CI_REF}</p>" >> {REPORT_DIR}/index.html
+""".format(
+            REPORT_DIR=REPORT_DIR,
+            CI_REPO_NAME=os.getenv("CI_REPO_NAME", _get_project_name()),
+            CI_REF=os.getenv("CI_COMMIT_TAG", os.getenv("CI_COMMIT_SHA", "undefined")),
+        )
+    )
 
 
 @myke.task
