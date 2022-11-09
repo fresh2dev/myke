@@ -12,12 +12,12 @@ def test_import_module(clean_dir):
     expected_file: str = os.path.join(os.getcwd(), "tasks", file_name)
 
     myke.import_module(
-        "https://www.fresh2.dev/code/r/mykefiles/raw/branch/dev/src/mykefiles/"
+        "https://codeberg.org/fresh2dev/mykefiles/raw/branch/dev/src/mykefiles/"
         + file_name
     )
     with pytest.raises(FileExistsError):
         myke.install_module(
-            "https://www.fresh2.dev/code/r/mykefiles/raw/branch/dev/src/mykefiles/"
+            "https://codeberg.org/fresh2dev/mykefiles/raw/branch/dev/src/mykefiles/"
             + file_name,
             fail_if_exists=True,
         )
@@ -25,7 +25,7 @@ def test_import_module(clean_dir):
     os.environ["MYKE_UPDATE_MODULES"] = "1"
 
     myke.install_module(
-        "https://www.fresh2.dev/code/r/mykefiles/raw/branch/dev/src/mykefiles/"
+        "https://codeberg.org/fresh2dev/mykefiles/raw/branch/dev/src/mykefiles/"
         + file_name,
         fail_if_exists=True,
     )

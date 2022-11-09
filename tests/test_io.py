@@ -114,8 +114,7 @@ def test_read_dotfile(resources_dir: str):
 
 
 def test_read_url():
-    # url: str =  "https://raw.githubusercontent.com/fresh2dev/AnyBox/main/LICENSE",
-    url: str = "https://www.fresh2.dev/code/r/copier-python/raw/branch/main/LICENSE"
+    url: str = "https://codeberg.org/fresh2dev/copier-python/raw/branch/main/LICENSE"
 
     resp: str = myke.read.url(url)
     # resp = requests.get(url)
