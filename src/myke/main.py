@@ -7,16 +7,12 @@ from typing import Any, Callable, List, Optional
 
 import yapx
 
+from .__version__ import __version__
 from .exceptions import NoTasksFoundError
 from .io import print, read, write
 from .tasks import MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS, import_module
 
 DEFAULT_MYKEFILE: str = "Mykefile"
-
-with open(
-    os.path.join(os.path.dirname(__file__), "VERSION"), mode="r", encoding="utf-8"
-) as _f:
-    __version__: str = _f.read().strip()
 
 
 def main(_file: Optional[str] = None) -> None:
@@ -136,10 +132,18 @@ def main(_file: Optional[str] = None) -> None:
     if myke_args.help or (not task_args and not myke_args.task_help_all):
         parser.print_help()
         print.text()
-        print.table(
-            [{"Command": k, "Source": v.__module__} for k, v in sorted(TASKS.items())],
-            tablefmt="github",
-        )
+        try:
+            print.table(
+                [
+                    {"Command": k, "Source": v.__module__}
+                    for k, v in sorted(TASKS.items())
+                ],
+                tablefmt="github",
+            )
+        except ModuleNotFoundError:
+            print.text("TASKS")
+            print.text("-----")
+            print.lines(list(sorted(TASKS.keys())))
         print.text()
         print.text("To view task parameters, see:")
         print.text(f"> {prog} <task-name> --help")
