@@ -69,7 +69,7 @@ def is_version(txt: str) -> bool:
     )
 
 
-class MykeSourceFileLoader(SourceFileLoader):
+class _MykeSourceFileLoader(SourceFileLoader):
     """SourceFileLoader that does not output '__pycache__'"""
 
     def _cache_bytecode(self, *args: Any, **kwargs: Any) -> None:

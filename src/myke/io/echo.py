@@ -1,22 +1,25 @@
 import collections.abc
 import os
-from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Union
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Union
+
+import yapx
+
+from ..globals import MYKE_VAR_NAME, TASKS
 
 
 class echo:
-    def __new__(self, txt: Optional[str] = None, **kwargs: Any) -> None:
-        self.text(txt, **kwargs)
+    def __new__(self, *args: Any, **kwargs: Any) -> None:
+        self.text(*args, **kwargs)
 
     @staticmethod
-    def _print(txt: str, print_kwargs: Optional[Dict[str, Any]] = None) -> None:
+    def _print(*args: Any, print_kwargs: Optional[Dict[str, Any]] = None) -> None:
         if not print_kwargs:
             print_kwargs = {}
-        print(txt, **print_kwargs)
+        print(*args, **print_kwargs)
 
     @classmethod
-    def text(cls, txt: Optional[str] = None, **kwargs: Any) -> None:
-        args = [txt] if txt is not None else []
-        cls._print(*args, kwargs)
+    def text(cls, *args: Any, **kwargs: Any) -> None:
+        cls._print(*args, print_kwargs=kwargs)
 
     @classmethod
     def lines(
@@ -25,7 +28,7 @@ class echo:
         linesep: str = os.linesep,
         print_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
-        cls._print(linesep.join(seq), print_kwargs)
+        cls._print(linesep.join(seq), print_kwargs=print_kwargs)
 
     @classmethod
     def json(
@@ -33,14 +36,14 @@ class echo:
     ) -> None:
         import json as _json
 
-        cls._print(_json.dumps(obj, **kwargs), print_kwargs)
+        cls._print(_json.dumps(obj, **kwargs), print_kwargs=print_kwargs)
 
     @classmethod
     def table(
         cls,
         obj: Union[Iterable[Iterable[Any]], Mapping[str, Iterable[Any]]],
         print_kwargs: Optional[Dict[str, Any]] = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None:
         from tabulate import tabulate
 
@@ -52,7 +55,7 @@ class echo:
         ):
             kwargs["headers"] = "keys"
 
-        cls._print(tabulate(obj, **kwargs), print_kwargs)
+        cls._print(tabulate(obj, **kwargs), print_kwargs=print_kwargs)
 
     @classmethod
     def pretty(
@@ -60,4 +63,33 @@ class echo:
     ) -> None:
         from pprint import pformat
 
-        cls._print(pformat(obj, **kwargs), print_kwargs)
+        cls._print(pformat(obj, **kwargs), print_kwargs=print_kwargs)
+
+    @classmethod
+    def tasks(cls, prog: Optional[str] = None, tablefmt: Optional[str] = None) -> None:
+        cls.text()
+
+        if not TASKS:
+            cls.text("No tasks found.")
+        else:
+            records: List[Dict[str, str]] = [
+                {"Command": k, "Source": v.__module__} for k, v in sorted(TASKS.items())
+            ]
+
+            if not prog:
+                prog = MYKE_VAR_NAME
+
+            try:
+                if not tablefmt:
+                    tablefmt = "github"
+                echo.table(records, tablefmt=tablefmt)
+            except ModuleNotFoundError:
+                cls.text("TASKS")
+                cls.text("-----")
+                cls.lines([str(x) if x else "" for x in records])
+
+            cls.text()
+            cls.text("To view task parameters, see:")
+            cls.text(f"> {prog} <task-name> --help")
+
+        cls.text()

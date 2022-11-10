@@ -200,3 +200,13 @@ def test_echo_pretty(capsys):
 
     captured = capsys.readouterr()
     assert captured.out == expected
+
+
+def test_echo_tasks(capsys):
+    myke.TASKS.clear()
+    expected: str = "No tasks found."
+
+    myke.echo.tasks()
+
+    captured = capsys.readouterr()
+    assert expected in captured.out

@@ -10,7 +10,7 @@ from .io.read import read
 from .io.write import write
 from .sh import sh
 from .utils import (
-    MykeSourceFileLoader,
+    _MykeSourceFileLoader,
     convert_to_command_string,
     make_executable,
     split_and_trim_text,
@@ -42,7 +42,7 @@ def import_module(*mykefiles: str, overwrite: Optional[bool] = None) -> None:
         if m.startswith("https://"):
             m = install_module(m, overwrite=overwrite)
 
-        loader = MykeSourceFileLoader(os.path.relpath(m), m)
+        loader = _MykeSourceFileLoader(os.path.relpath(m), m)
         mod: ModuleType = ModuleType(loader.name)
         loader.exec_module(mod)
 

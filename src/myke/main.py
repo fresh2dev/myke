@@ -132,23 +132,7 @@ def main(_file: Optional[str] = None) -> None:
 
     if myke_args.help or (not task_args and not myke_args.task_help_all):
         parser.print_help()
-        echo()
-        try:
-            echo.table(
-                [
-                    {"Command": k, "Source": v.__module__}
-                    for k, v in sorted(TASKS.items())
-                ],
-                tablefmt="github",
-            )
-        except ModuleNotFoundError:
-            echo("TASKS")
-            echo("-----")
-            echo.lines(list(sorted(TASKS.keys())))
-        echo()
-        echo("To view task parameters, see:")
-        echo(f"> {prog} <task-name> --help")
-        echo()
+        echo.tasks(prog=prog)
         parser.exit()
 
     if myke_args.task_help:

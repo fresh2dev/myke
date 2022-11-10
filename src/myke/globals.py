@@ -1,6 +1,5 @@
 from typing import Callable, Dict
 
-
 TASKS: Dict[str, Callable[..., None]] = {}
 
 MYKE_VAR_NAME: str = "myke"
