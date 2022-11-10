@@ -110,7 +110,7 @@ def test_Mykefile_hello_env2(clean_dir, capsys, resources_dir: str):
     from myke import write
 
     expected_txt: str = str(uuid4())
-    write.text(f"NAME={expected_txt}", path=".env")
+    write(f"NAME={expected_txt}", path=".env")
     cli_args: List[str] = ["--myke-env-file", ".env", "hello-env2"]
     _ = _common(capsys, resources_dir, cli_args=cli_args, expected_txt=expected_txt)
 

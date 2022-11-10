@@ -9,9 +9,9 @@ import myke
 
 
 myke.import_module(
-    "https://www.fresh2.dev/code/r/mykefiles/raw/branch/dev"
+    "https://codeberg.org/fresh2dev/mykefiles/raw/branch/dev"
     "/src/mykefiles/hostbutter.py",
-    "https://www.fresh2.dev/code/r/mykefiles/raw/branch/dev"
+    "https://codeberg.org/fresh2dev/mykefiles/raw/branch/dev"
     "/src/mykefiles/python-package.py",
 )
 
