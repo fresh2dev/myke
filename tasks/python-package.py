@@ -70,7 +70,7 @@ def _get_next_version(
         version = os.getenv("CI_COMMIT_TAG", None)
         if not version:
             if os.path.exists(VERSION_FILE):
-                version = myke.read(VERSION_FILE)
+                version = myke.read.text(VERSION_FILE)
             else:
                 version = "0.0.1a1"
 
@@ -113,10 +113,10 @@ def x_set_version(
     if version_og != version:
         if _echo:
             print(f"{version_og} --> {version}")
-        myke.write(path=VERSION_FILE, content=version + os.linesep, overwrite=True)
+        myke.write.text(path=VERSION_FILE, content=version + os.linesep, overwrite=True)
 
         if not os.path.exists("MANIFEST.in"):
-            myke.write(path="MANIFEST.in", content=f"include {VERSION_FILE}")
+            myke.write.text(path="MANIFEST.in", content=f"include {VERSION_FILE}")
 
         myke.sh(
             r"sed 's/^version.*/version = file: VERSION/' setup.cfg > setup.cfg.tmp "
@@ -126,7 +126,7 @@ def x_set_version(
     assert version == x_get_version(_echo=False)
 
     for pkg in _get_package_dirs():
-        myke.write(
+        myke.write.text(
             content=f'__version__ = "{version}"' + os.linesep,
             path=os.path.join(pkg, "__version__.py"),
             overwrite=True,
@@ -320,7 +320,7 @@ def x_test_tox() -> None:
 def x_test_py() -> None:
     og_venv: Optional[str] = None
     if os.path.exists(PYENV_VERSION_FILE):
-        og_venv = myke.read(PYENV_VERSION_FILE)
+        og_venv = myke.read.text(PYENV_VERSION_FILE)
 
     proj_name: str = _get_project_name()
 
@@ -333,7 +333,7 @@ def x_test_py() -> None:
     finally:
         myke.sh(f"pyenv local {proj_name}")
         if og_venv:
-            myke.write(
+            myke.write.text(
                 path=PYENV_VERSION_FILE, content=og_venv + os.linesep, overwrite=True
             )
 
