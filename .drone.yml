@@ -44,10 +44,10 @@ data:
     [
       {
         "name": "build-reports",
-        "image": "registry.lokalhost.net/fresh2dev/docker-myke:0.0.1a1",
+        "image": "registry.lokalhost.net/fresh2dev/docker-myke:0.0.1a3",
         "commands": [
-          "myke requirements",
-          "myke reports"
+          "myke py-requirements",
+          "myke py-reports"
         ]
       }
     ]
@@ -57,29 +57,29 @@ data:
     [
       {
         "name": "py-build-package",
-        "image": "registry.lokalhost.net/fresh2dev/docker-myke:0.0.1a1",
+        "image": "registry.lokalhost.net/fresh2dev/docker-myke:0.0.1a3",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"}
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
-          "myke set-version --repository lokalhost",
-          "myke requirements -e build",
-          "myke build"
+          "myke py-set-version --repository lokalhost",
+          "myke py-requirements -e build",
+          "myke py-build"
         ],
         "when": {}
       },
       {
         "name": "py-publish-dev",
-        "image": "registry.lokalhost.net/fresh2dev/docker-myke:0.0.1a1",
+        "image": "registry.lokalhost.net/fresh2dev/docker-myke:0.0.1a3",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
           "TWINE_CERT": "/etc/ssl/certs/ca-certificates.crt"
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
-          "myke requirements -e build",
-          "myke publish --repository lokalhost"
+          "myke py-requirements -e build",
+          "myke py-publish --repository lokalhost"
         ],
         "when": {
           "ref": ["refs/heads/dev", "refs/heads/main", "refs/tags/*"]
@@ -87,15 +87,15 @@ data:
       },
       {
         "name": "py-publish-test",
-        "image": "registry.lokalhost.net/fresh2dev/docker-myke:0.0.1a1",
+        "image": "registry.lokalhost.net/fresh2dev/docker-myke:0.0.1a3",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
           "TWINE_CERT": "/etc/ssl/certs/ca-certificates.crt"
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
-          "myke requirements -e build",
-          "myke publish --repository testpypi"
+          "myke py-requirements -e build",
+          "myke py-publish --repository testpypi"
         ],
         "when": {
           "ref": ["refs/heads/main", "refs/tags/*"]
@@ -103,16 +103,16 @@ data:
       },
       {
         "name": "py-publish-prod",
-        "image": "registry.lokalhost.net/fresh2dev/docker-myke:0.0.1a1",
+        "image": "registry.lokalhost.net/fresh2dev/docker-myke:0.0.1a3",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
           "TWINE_CERT": "/etc/ssl/certs/ca-certificates.crt"
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
-          "myke requirements -e build",
-          "myke publish --repository codeberg",
-          "myke publish --repository pypi"
+          "myke py-requirements -e build",
+          "myke py-publish --repository codeberg",
+          "myke py-publish --repository pypi"
         ],
         "when": {
           "ref": ["refs/tags/*"]
