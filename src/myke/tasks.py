@@ -5,7 +5,9 @@ from types import ModuleType
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 from .exceptions import MykeNotFoundError, NoTasksFoundError, TaskAlreadyRegisteredError
-from .io import read, write
+from .globals import MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS
+from .io.read import read
+from .io.write import write
 from .sh import sh
 from .utils import (
     MykeSourceFileLoader,
@@ -13,12 +15,6 @@ from .utils import (
     make_executable,
     split_and_trim_text,
 )
-
-TASKS: Dict[str, Callable[..., None]] = {}
-
-MYKE_VAR_NAME: str = "myke"
-
-ROOT_TASK_KEY: str = "__root__"
 
 
 def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
@@ -88,7 +84,7 @@ def install_module(
     if import_myke not in resp_text:
         raise MykeNotFoundError(f'"{import_myke}" not found response text of {url}')
 
-    write.text(resp_text, path=path, overwrite=overwrite)
+    write(resp_text, path=path, overwrite=overwrite)
 
     make_executable(path)
 

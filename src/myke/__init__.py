@@ -27,11 +27,13 @@ from yapx import arg
 
 from . import exceptions, utils
 from .__version__ import __version__
-from .io import echo, read, write
+from .globals import TASKS
+from .io.echo import echo
+from .io.read import read
+from .io.write import write
 from .main import main
 from .sh import sh, sh_stdout, sh_stdout_lines
 from .tasks import (
-    TASKS,
     add_tasks,
     import_module,
     install_module,

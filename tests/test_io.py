@@ -12,7 +12,7 @@ def test_read_text(resources_dir: str):
     file: str = os.path.join(resources_dir, "files", "test.txt")
 
     # 2. ACT
-    content: str = myke.read.text(file)
+    content: str = myke.read(file)
 
     # 3. ASSERT
     assert content
@@ -127,16 +127,16 @@ def test_write_text(tmp_path: Path):
     expected: str = "hello world"
 
     path = str(tmp_path / "dummy.txt")
-    myke.write.text(expected, path)
+    myke.write(expected, path)
 
     assert os.path.exists(path)
-    assert myke.read.text(path) == expected
+    assert myke.read(path) == expected
 
-    myke.write.text(expected, path, append=True)
-    assert myke.read.text(path) == expected * 2
+    myke.write(expected, path, append=True)
+    assert myke.read(path) == expected * 2
 
     with pytest.raises(FileExistsError):
-        myke.write.text(content=expected, path=path)
+        myke.write(content=expected, path=path)
 
 
 def test_write_lines(tmp_path: Path):
@@ -156,7 +156,7 @@ def test_echo_text(capsys):
     test_input: str = "hello world"
     expected: str = test_input + os.linesep
 
-    myke.echo.text(test_input)
+    myke.echo(test_input)
 
     captured = capsys.readouterr()
     assert captured.out == expected

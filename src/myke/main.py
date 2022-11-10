@@ -9,10 +9,11 @@ import yapx
 
 from .__version__ import __version__
 from .exceptions import NoTasksFoundError
-from .io import echo, read, write
-from .tasks import MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS, import_module
-
-DEFAULT_MYKEFILE: str = "Mykefile"
+from .globals import DEFAULT_MYKEFILE, MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS
+from .io.echo import echo
+from .io.read import read
+from .io.write import write
+from .tasks import import_module
 
 
 def main(_file: Optional[str] = None) -> None:
@@ -78,11 +79,11 @@ def main(_file: Optional[str] = None) -> None:
     assert isinstance(myke_args, MykeArgs)
 
     if myke_args.version:
-        echo.text(__version__)
+        echo(__version__)
         parser.exit()
     elif myke_args.create:
         write.mykefile(myke_args.file)
-        echo.text(f"Created: {myke_args.file}")
+        echo(f"Created: {myke_args.file}")
         parser.exit()
 
     if myke_args.env_file:
@@ -118,7 +119,7 @@ def main(_file: Optional[str] = None) -> None:
                 raise NoTasksFoundError(f)
         except FileNotFoundError:
             parser.print_help()
-            echo.text(
+            echo(
                 f"{os.linesep}"
                 f"'{myke_args.file}' not found. Create it using:"
                 f"{os.linesep}"
@@ -131,7 +132,7 @@ def main(_file: Optional[str] = None) -> None:
 
     if myke_args.help or (not task_args and not myke_args.task_help_all):
         parser.print_help()
-        echo.text()
+        echo()
         try:
             echo.table(
                 [
@@ -141,13 +142,13 @@ def main(_file: Optional[str] = None) -> None:
                 tablefmt="github",
             )
         except ModuleNotFoundError:
-            echo.text("TASKS")
-            echo.text("-----")
+            echo("TASKS")
+            echo("-----")
             echo.lines(list(sorted(TASKS.keys())))
-        echo.text()
-        echo.text("To view task parameters, see:")
-        echo.text(f"> {prog} <task-name> --help")
-        echo.text()
+        echo()
+        echo("To view task parameters, see:")
+        echo(f"> {prog} <task-name> --help")
+        echo()
         parser.exit()
 
     if myke_args.task_help:
