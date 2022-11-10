@@ -5,20 +5,16 @@ from types import ModuleType
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 from .exceptions import MykeNotFoundError, NoTasksFoundError, TaskAlreadyRegisteredError
-from .io import read, write
+from .globals import MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS
+from .io.read import read
+from .io.write import write
 from .sh import sh
 from .utils import (
-    MykeSourceFileLoader,
+    _MykeSourceFileLoader,
     convert_to_command_string,
     make_executable,
     split_and_trim_text,
 )
-
-TASKS: Dict[str, Callable[..., None]] = {}
-
-MYKE_VAR_NAME: str = "myke"
-
-ROOT_TASK_KEY: str = "__root__"
 
 
 def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
@@ -40,13 +36,13 @@ def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
         TASKS[k] = v
 
 
-def import_module(*mykefiles: str, overwrite: bool = False) -> None:
+def import_module(*mykefiles: str, overwrite: Optional[bool] = None) -> None:
     n_tasks_before: int = len(TASKS)
     for m in mykefiles:
         if m.startswith("https://"):
             m = install_module(m, overwrite=overwrite)
 
-        loader = MykeSourceFileLoader(os.path.relpath(m), m)
+        loader = _MykeSourceFileLoader(os.path.relpath(m), m)
         mod: ModuleType = ModuleType(loader.name)
         loader.exec_module(mod)
 
@@ -62,9 +58,12 @@ def import_module(*mykefiles: str, overwrite: bool = False) -> None:
 def install_module(
     url: str,
     path: Optional[str] = None,
-    if_not_exists: bool = True,
-    overwrite: bool = False,
+    fail_if_exists: Optional[bool] = None,
+    overwrite: Optional[bool] = None,
 ) -> str:
+    if overwrite is None:
+        overwrite = bool(os.getenv("MYKE_UPDATE_MODULES"))
+
     if not url.startswith("https://"):
         raise ValueError("Download URLs must start with 'https://'")
 
@@ -76,7 +75,7 @@ def install_module(
 
         path = os.path.join(path, os.path.basename(url))
 
-    if not overwrite and os.path.exists(path) and if_not_exists:
+    if not overwrite and not fail_if_exists and os.path.exists(path):
         return path
 
     resp_text: str = read.url(url)
@@ -85,7 +84,7 @@ def install_module(
     if import_myke not in resp_text:
         raise MykeNotFoundError(f'"{import_myke}" not found response text of {url}')
 
-    write.text(resp_text, path=path, overwrite=overwrite)
+    write(resp_text, path=path, overwrite=overwrite)
 
     make_executable(path)
 

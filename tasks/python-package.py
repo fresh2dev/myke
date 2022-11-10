@@ -30,8 +30,9 @@ def _get_package_dirs() -> List[str]:
 
 
 @myke.cache()
-def _get_project_name() -> str:
-    return myke.sh_stdout("python setup.py --name")
+def _get_project_name() -> Optional[str]:
+    # return myke.sh_stdout("python setup.py --name")
+    return myke.read.cfg("setup.cfg").get("metadata", {}).get("name")
 
 
 @myke.task
@@ -89,14 +90,16 @@ def _get_next_version(
         version = next_dev_version
 
     if not os.path.exists(VERSION_FILE):
-        x_set_version(version)
+        x_set_version(version, _echo=False)
 
     return version
 
 
 @myke.task
 def x_set_version(
-    version=myke.arg(None, pos=True), repository: Optional[str] = None
+    version=myke.arg(None, pos=True),
+    repository: Optional[str] = None,
+    _echo: bool = True,
 ) -> None:
     version_og: Optional[str] = None
     try:
@@ -108,7 +111,8 @@ def x_set_version(
         version = _get_next_version(version=version, repository=repository)
 
     if version_og != version:
-        print(f"{version_og} --> {version}")
+        if _echo:
+            print(f"{version_og} --> {version}")
         myke.write.text(path=VERSION_FILE, content=version + os.linesep, overwrite=True)
 
         if not os.path.exists("MANIFEST.in"):
@@ -122,13 +126,18 @@ def x_set_version(
     assert version == x_get_version(_echo=False)
 
     for pkg in _get_package_dirs():
-        myke.sh(f'cp "{VERSION_FILE}" "{os.path.join(pkg, VERSION_FILE)}"')
+        myke.write.text(
+            content=f'__version__ = "{version}"' + os.linesep,
+            path=os.path.join(pkg, "__version__.py"),
+            overwrite=True,
+        )
 
 
 @myke.task_sh
 def x_clean():
     return r"""
 rm -rf dist build public src/*.egg-info .mypy_cache .pytest_cache .coverage .hypothesis .tox
+find . -type f -name "*.rej" -delete
 find . -type d -name "__pycache__" | xargs -r rm -rf
 """
 
@@ -159,6 +168,11 @@ export PYENV_VIRTUALENV_DISABLE_PROMPT=1 \\
 && pyenv local {name}
 """
     )
+
+    core_reqs = ["pip", "setuptools", "wheel"]
+
+    core_reqs_str: str = "'" + "' '".join(core_reqs) + "'"
+    myke.sh(f"pip install --upgrade {core_reqs_str}")
 
     x_requirements(extras=extras, quiet=quiet)
 
@@ -200,9 +214,7 @@ def x_requirements(
     if quiet:
         quiet_flag = "-q"
 
-    build_reqs = ["pip", "setuptools", "wheel"]
-
-    for reqs in build_reqs, install_requires, extra_reqs:
+    for reqs in install_requires, extra_reqs:
         if reqs:
             reqs = [x.replace("'", '"') for x in reqs]
             reqs_str: str = "'" + "' '".join(reqs) + "'"
@@ -328,33 +340,31 @@ def x_test_py() -> None:
 
 @myke.task_sh
 def x_mkdocs_serve() -> str:
-    return "mkdocs serve --config-file config/mkdocs.yml"
+    return r"PYTHONPATH=src mkdocs serve --config-file config/mkdocs.yml"
 
 
 @myke.task
 def x_docs() -> None:
 
+    myke.sh(r"PYTHONPATH=src mkdocs build --clean --config-file config/mkdocs.yml")
+
     myke.sh(
-        f"""
-python -m pdoc -o {REPORT_DIR}/srcdocs --docformat google --search --show-source {_get_package_root()}
-"""
+        r"""
+echo "<h1>{CI_REPO_NAME}</h1>" > {REPORT_DIR}/index.html
+echo "<h2>Reports:</h2>" >> {REPORT_DIR}/index.html
+echo '<ul style="font-size: 1.5em">' >> {REPORT_DIR}/index.html
+find {REPORT_DIR} -mindepth 1 -maxdepth 1 -type d | sort | while read -r dir; do \
+    BASE_DIR="$(basename "$dir")" \
+    && echo "<li><a href='$BASE_DIR/' target='_blank'>$BASE_DIR</a></li>" >> {REPORT_DIR}/index.html; \
+  done
+echo '</ul>' >> {REPORT_DIR}/index.html
+echo "<p>Ref: {CI_REF}</p>" >> {REPORT_DIR}/index.html
+""".format(
+            REPORT_DIR=REPORT_DIR,
+            CI_REPO_NAME=os.getenv("CI_REPO_NAME", _get_project_name()),
+            CI_REF=os.getenv("CI_COMMIT_TAG", os.getenv("CI_COMMIT_SHA", "undefined")),
+        )
     )
-
-    myke.sh(r"mkdocs build --clean --config-file config/mkdocs.yml")
-
-
-#     return f"""
-# echo "<h1>${{DRONE_REPO_NAME}}</h1>" > {REPORT_DIR}/index.html
-# echo "<h2>Reports:</h2>" >> {REPORT_DIR}/index.html
-# echo '<ul style="font-size: 1.5em">' >> {REPORT_DIR}/index.html
-# find {REPORT_DIR} -mindepth 1 -maxdepth 1 -type d | sort | while read -r dir; do \
-#     BASE_DIR="$(basename "${{dir}}")" \
-#     && echo "<li><a href='${{BASE_DIR}}/' target='_blank'>${{BASE_DIR}}</a></li>" >> {REPORT_DIR}/index.html; \
-#   done
-# echo '</ul>' >> {REPORT_DIR}/index.html
-# echo "<p>Ref: ${{DRONE_COMMIT}}</p>" >> {REPORT_DIR}/index.html
-# echo "<p>Timestamp: ${{DRONE_BUILD_STARTED}}</p>" >> {REPORT_DIR}/index.html
-# """
 
 
 @myke.task
@@ -386,7 +396,7 @@ python -m twine upload --verbose --non-interactive -r {repository} dist/*
 
 @myke.task
 def x_init() -> None:
-    x_set_version()
+    x_set_version(None)
     x_env()
     x_reports()
 

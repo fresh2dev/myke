@@ -1,5 +1,3 @@
-__all__ = ["CalledProcessError"]
-
 import os
 import subprocess
 

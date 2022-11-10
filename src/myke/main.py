@@ -7,16 +7,13 @@ from typing import Any, Callable, List, Optional
 
 import yapx
 
+from .__version__ import __version__
 from .exceptions import NoTasksFoundError
-from .io import print, read, write
-from .tasks import MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS, import_module
-
-DEFAULT_MYKEFILE: str = "Mykefile"
-
-with open(
-    os.path.join(os.path.dirname(__file__), "VERSION"), mode="r", encoding="utf-8"
-) as _f:
-    __version__: str = _f.read().strip()
+from .globals import DEFAULT_MYKEFILE, MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS
+from .io.echo import echo
+from .io.read import read
+from .io.write import write
+from .tasks import import_module
 
 
 def main(_file: Optional[str] = None) -> None:
@@ -38,6 +35,12 @@ def main(_file: Optional[str] = None) -> None:
             default=None,
             flags=["--myke-env-file"],
             env_var="MYKE_ENV_FILE",
+            group="myke args",
+        )
+        update_modules: bool = yapx.arg(
+            default=False,
+            flags=["--myke-update-modules"],
+            env_var="MYKE_UPDATE_MODULES",
             group="myke args",
         )
         no_pydantic: bool = yapx.arg(
@@ -76,15 +79,18 @@ def main(_file: Optional[str] = None) -> None:
     assert isinstance(myke_args, MykeArgs)
 
     if myke_args.version:
-        print.text(__version__)
+        echo(__version__)
         parser.exit()
     elif myke_args.create:
         write.mykefile(myke_args.file)
-        print.text(f"Created: {myke_args.file}")
+        echo(f"Created: {myke_args.file}")
         parser.exit()
 
     if myke_args.env_file:
         os.environ.update(read.envfile(myke_args.env_file))
+
+    if myke_args.update_modules:
+        os.environ["MYKE_UPDATE_MODULES"] = "1"
 
     if _file:
         if not os.path.exists(_file):
@@ -113,7 +119,7 @@ def main(_file: Optional[str] = None) -> None:
                 raise NoTasksFoundError(f)
         except FileNotFoundError:
             parser.print_help()
-            print.text(
+            echo(
                 f"{os.linesep}"
                 f"'{myke_args.file}' not found. Create it using:"
                 f"{os.linesep}"
@@ -126,15 +132,7 @@ def main(_file: Optional[str] = None) -> None:
 
     if myke_args.help or (not task_args and not myke_args.task_help_all):
         parser.print_help()
-        print.text()
-        print.table(
-            [{"Command": k, "Source": v.__module__} for k, v in sorted(TASKS.items())],
-            tablefmt="github",
-        )
-        print.text()
-        print.text("To view task parameters, see:")
-        print.text(f"> {prog} <task-name> --help")
-        print.text()
+        echo.tasks(prog=prog)
         parser.exit()
 
     if myke_args.task_help:
