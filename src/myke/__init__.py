@@ -18,7 +18,7 @@ __all__ = [
     "utils",
     "exceptions",
     "cache",
-    "print",
+    "echo",
 ]
 
 from functools import lru_cache as cache
@@ -27,7 +27,7 @@ from yapx import arg
 
 from . import exceptions, utils
 from .__version__ import __version__
-from .io import print, read, write
+from .io import echo, read, write
 from .main import main
 from .sh import sh, sh_stdout, sh_stdout_lines
 from .tasks import (

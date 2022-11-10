@@ -10,7 +10,7 @@ def text(txt: Optional[str] = None, **kwargs: Any) -> None:
 
 
 @wraps(text)
-def _print(txt: str, print_kwargs: Optional[Dict[str, Any]] = None) -> None:
+def _echo(txt: str, print_kwargs: Optional[Dict[str, Any]] = None) -> None:
     if not print_kwargs:
         print_kwargs = {}
     print(txt, **print_kwargs)
@@ -21,7 +21,7 @@ def lines(
     linesep: str = os.linesep,
     print_kwargs: Optional[Dict[str, Any]] = None,
 ) -> None:
-    _print(linesep.join(seq), print_kwargs)
+    _echo(linesep.join(seq), print_kwargs)
 
 
 def json(
@@ -29,7 +29,7 @@ def json(
 ) -> None:
     import json as _json
 
-    _print(_json.dumps(obj, **kwargs), print_kwargs)
+    _echo(_json.dumps(obj, **kwargs), print_kwargs)
 
 
 def table(
@@ -47,7 +47,7 @@ def table(
     ):
         kwargs["headers"] = "keys"
 
-    _print(tabulate(obj, **kwargs), print_kwargs)
+    _echo(tabulate(obj, **kwargs), print_kwargs)
 
 
 def pretty(
@@ -55,4 +55,4 @@ def pretty(
 ) -> None:
     from pprint import pformat
 
-    _print(pformat(obj, **kwargs), print_kwargs)
+    _echo(pformat(obj, **kwargs), print_kwargs)
