@@ -32,22 +32,22 @@ class read(str):
         with open(path, "r", encoding=encoding) as f:
             return f.read().strip()
 
-    @wraps(text)
     @classmethod
+    @wraps(text)
     def lines(cls, *args: str, **kwargs: str) -> List[str]:
         return [
             y for x in cls.text(*args, **kwargs).splitlines() for y in [x.strip()] if y
         ]
 
-    @wraps(text)
     @classmethod
+    @wraps(text)
     def json(cls, *args: str, **kwargs: str) -> Dict[str, Any]:
         import json as _json
 
         return cls._read_simple_dict(partial(_json.loads, cls.text(*args, **kwargs)))
 
-    @wraps(text)
     @classmethod
+    @wraps(text)
     def yaml(cls, *args: str, **kwargs: str) -> Dict[str, Any]:
         import yaml as _yaml
 
@@ -55,8 +55,8 @@ class read(str):
             partial(_yaml.safe_load, cls.text(*args, **kwargs))
         )
 
-    @wraps(text)
     @classmethod
+    @wraps(text)
     def yaml_all(cls, *args: str, **kwargs: str) -> List[Dict[str, Any]]:
         import yaml as _yaml
 
@@ -68,8 +68,8 @@ class read(str):
 
         return _yaml_all(cls.text(*args, **kwargs))
 
-    @wraps(text)
     @classmethod
+    @wraps(text)
     def toml(cls, *args: str, **kwargs: str) -> Dict[str, Any]:
         try:
             import tomli as _toml
@@ -78,8 +78,8 @@ class read(str):
 
         return cls._read_simple_dict(partial(_toml.loads, cls.text(*args, **kwargs)))
 
-    @wraps(text)
     @classmethod
+    @wraps(text)
     def cfg(cls, *args: str, **kwargs: str) -> Dict[str, Any]:
         from configparser import ConfigParser
 
@@ -90,13 +90,13 @@ class read(str):
 
         return cls._read_simple_dict(partial(_read_cfg, cls.text(*args, **kwargs)))
 
-    @wraps(cfg)
     @classmethod
+    @wraps(cfg)
     def ini(cls, *args: str, **kwargs: str) -> Dict[str, Any]:
         return cls.cfg(*args, **kwargs)
 
-    @wraps(text)
     @classmethod
+    @wraps(text)
     def dotfile(cls, *args: str, **kwargs: str) -> Dict[str, str]:
         from io import StringIO
 
@@ -106,8 +106,8 @@ class read(str):
             partial(dotenv_values, stream=StringIO(cls.text(*args, **kwargs)))
         )
 
-    @wraps(dotfile)
     @classmethod
+    @wraps(dotfile)
     def envfile(cls, *args: str, **kwargs: str) -> Dict[str, str]:
         return cls.dotfile(*args, **kwargs)
 
