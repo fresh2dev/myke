@@ -8,7 +8,7 @@ def test_import_module(clean_dir):
 
     myke.TASKS.clear()
 
-    file_name: str = "python-package.py"
+    file_name: str = "py_pkg.py"
     expected_file: str = os.path.join(os.getcwd(), "tasks", file_name)
 
     myke.import_module(
