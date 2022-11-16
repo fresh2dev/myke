@@ -10,9 +10,7 @@ data:
     {}
   domainTriggers: >-
     {
-      "lokalhost.net": {
-        "ref": ["refs/heads/dev", "refs/heads/main", "refs/tags/*"]
-      },
+      "lokalhost.net": {},
       "fresh2.dev": {
         "ref": ["refs/heads/main", "refs/tags/*"]
       }
