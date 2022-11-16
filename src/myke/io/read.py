@@ -9,8 +9,8 @@ except ImportError:
 
 
 class read(str):
-    def __new__(self, path: str, encoding: str = "utf-8") -> str:
-        return self.text(path=path, encoding=encoding)
+    def __new__(cls, path: str, encoding: str = "utf-8") -> str:  # type: ignore
+        return cls.text(path=path, encoding=encoding)
 
     @staticmethod
     def _is_simple_dict(candidate: Any) -> TypeGuard[Dict[str, Any]]:
@@ -29,7 +29,7 @@ class read(str):
 
     @staticmethod
     def text(path: str, encoding: str = "utf-8") -> str:
-        with open(path, "r", encoding=encoding) as f:
+        with open(path, encoding=encoding) as f:
             return f.read().strip()
 
     @classmethod

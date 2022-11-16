@@ -2,14 +2,12 @@ import collections.abc
 import os
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Union
 
-import yapx
-
 from ..globals import MYKE_VAR_NAME, TASKS
 
 
 class echo:
-    def __new__(self, *args: Any, **kwargs: Any) -> None:
-        self.text(*args, **kwargs)
+    def __new__(cls, *args: Any, **kwargs: Any) -> None:  # type: ignore
+        cls.text(*args, **kwargs)
 
     @staticmethod
     def _print(*args: Any, print_kwargs: Optional[Dict[str, Any]] = None) -> None:

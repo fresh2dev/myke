@@ -1,9 +1,9 @@
-__all__ = ["__version__", "main", "sys"]
+from __future__ import annotations
 
 import os
 import sys
 from dataclasses import dataclass
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable
 
 import yapx
 
@@ -15,8 +15,10 @@ from .io.read import read
 from .io.write import write
 from .tasks import import_module
 
+__all__ = ["__version__", "main", "sys"]
 
-def main(_file: Optional[str] = None) -> None:
+
+def main(_file: str | None = None) -> None:
     @dataclass
     class MykeArgs(yapx.types.Dataclass):
         file: str = yapx.arg(
@@ -25,7 +27,7 @@ def main(_file: Optional[str] = None) -> None:
             env_var="MYKE_FILE",
             group="myke args",
         )
-        file_paths: List[str] = yapx.arg(
+        file_paths: list[str] = yapx.arg(
             default=lambda: [os.path.expanduser("~"), os.getcwd()],
             flags=["--myke-file-paths"],
             env_var="MYKE_FILE_PATHS",
@@ -72,7 +74,7 @@ def main(_file: Optional[str] = None) -> None:
     parser.add_arguments(MykeArgs)
 
     myke_args: MykeArgs
-    task_args: List[str]
+    task_args: list[str]
     myke_args, task_args = parser.parse_known_args_to_model(
         sys.argv[1:], args_model=MykeArgs, use_pydantic=False
     )
@@ -99,7 +101,7 @@ def main(_file: Optional[str] = None) -> None:
             raise NoTasksFoundError(_file)
         _file = os.path.abspath(_file)
 
-    mykefiles: List[str] = (
+    mykefiles: list[str] = (
         [myke_args.file]
         if os.path.dirname(myke_args.file)
         else [
@@ -128,7 +130,7 @@ def main(_file: Optional[str] = None) -> None:
             )
             parser.exit()
 
-    root_task: Optional[Callable[..., Any]] = TASKS.pop(ROOT_TASK_KEY, None)
+    root_task: Callable[..., Any] | None = TASKS.pop(ROOT_TASK_KEY, None)
 
     if myke_args.help or (not task_args and not myke_args.task_help_all):
         parser.print_help()

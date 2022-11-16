@@ -1,20 +1,21 @@
+from __future__ import annotations
+
+import os
+import re
+import stat
+from importlib.machinery import SourceFileLoader
+from typing import Any
+
+from yapx.utils import convert_to_command_string
+
 __all__ = [
     "convert_to_command_string",
     "make_executable",
     "is_version",
 ]
 
-import os
-import re
-import stat
-from functools import wraps
-from importlib.machinery import SourceFileLoader
-from typing import Any, List, Optional
 
-from yapx.utils import convert_to_command_string
-
-
-def split_and_trim_text(txt: Optional[str]) -> List[str]:
+def split_and_trim_text(txt: str | None) -> list[str]:
     if txt is None:
         return []
 
