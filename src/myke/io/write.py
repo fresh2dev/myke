@@ -7,15 +7,15 @@ from ..utils import make_executable
 
 
 class write:
-    def __new__(
-        self,
+    def __new__(  # type: ignore
+        cls,
         content: Union[str, bytes],
         path: str,
         append: bool = False,
         overwrite: bool = False,
         **kwargs: Any
     ) -> None:
-        self.text(
+        cls.text(
             content=content, path=path, append=append, overwrite=overwrite, **kwargs
         )
 

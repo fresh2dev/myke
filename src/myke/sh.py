@@ -1,33 +1,34 @@
-__all__ = ["sh", "sh_stdout", "sh_stdout_lines"]
+from __future__ import annotations
 
 import os
 import subprocess
+import sys
 from functools import wraps
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Sequence
 
 from .exceptions import CalledProcessError
 from .utils import split_and_trim_text
 
+__all__ = ["sh", "sh_stdout", "sh_stdout_lines"]
+
 
 def sh(
-    args: Union[str, Sequence[str]],
-    capture_output: Optional[bool] = False,
-    echo: Optional[bool] = True,
-    check: Optional[bool] = True,
-    cwd: Optional[str] = None,
-    env: Optional[Dict[str, str]] = None,
-    env_update: Optional[Dict[str, str]] = None,
-    timeout: Optional[float] = None,
+    args: str | Sequence[str],
+    capture_output: None | bool = False,
+    echo: bool | None = True,
+    check: bool | None = True,
+    cwd: str | None = None,
+    env: dict[str, str] | None = None,
+    env_update: dict[str, str] | None = None,
+    timeout: float | None = None,
     **kwargs: Any,
-) -> Tuple[Optional[str], Optional[str], int]:
+) -> tuple[str | None, str | None, int]:
 
-    kwargs["args"] = args
     kwargs["cwd"] = cwd
     kwargs["timeout"] = timeout
-    kwargs["check"] = False
-    kwargs["shell"] = True
-    kwargs["text"] = True
+    kwargs["shell"] = kwargs.get("shell", True)
     kwargs["capture_output"] = capture_output
+    kwargs["text"] = True
 
     if env:
         env = env.copy()
@@ -39,8 +40,7 @@ def sh(
 
     kwargs["env"] = env
 
-    p: subprocess.CompletedProcess = subprocess.run(**kwargs)
-    assert isinstance(p, subprocess.CompletedProcess)
+    p: subprocess.CompletedProcess[str] = subprocess.run(args, check=False, **kwargs)
 
     if capture_output and echo:
         if p.stdout:
@@ -55,7 +55,7 @@ def sh(
 
 
 @wraps(sh)
-def sh_stdout_lines(*args: Any, **kwargs: Any) -> List[str]:
+def sh_stdout_lines(*args: Any, **kwargs: Any) -> list[str]:
     kwargs["capture_output"] = True
     kwargs["echo"] = kwargs.get("echo", False)
     stdout, *_ = sh(*args, **kwargs)
