@@ -1,6 +1,8 @@
-from typing import Callable, Dict
+from __future__ import annotations
 
-TASKS: Dict[str, Callable[..., None]] = {}
+from typing import Callable
+
+TASKS: dict[str, Callable[..., None]] = {}
 
 MYKE_VAR_NAME: str = "myke"
 

@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import collections.abc
 import os
 from functools import partial, wraps
 from types import ModuleType
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, Sequence
 
 from .exceptions import MykeNotFoundError, NoTasksFoundError, TaskAlreadyRegisteredError
 from .globals import MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS
@@ -27,7 +29,7 @@ def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
     }
 
     for k, v in kwargs.items():
-        v_existing: Optional[Callable[..., Any]] = TASKS.get(k, None)
+        v_existing: Callable[..., Any] | None = TASKS.get(k, None)
         if v_existing:
             raise TaskAlreadyRegisteredError(
                 f"Failed to import module '{v.__module__}': "
@@ -36,7 +38,7 @@ def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
         TASKS[k] = v
 
 
-def import_module(*mykefiles: str, overwrite: Optional[bool] = None) -> None:
+def import_module(*mykefiles: str, overwrite: bool | None = None) -> None:
     n_tasks_before: int = len(TASKS)
     for m in mykefiles:
         if m.startswith("https://"):
@@ -57,9 +59,9 @@ def import_module(*mykefiles: str, overwrite: Optional[bool] = None) -> None:
 
 def install_module(
     url: str,
-    path: Optional[str] = None,
-    fail_if_exists: Optional[bool] = None,
-    overwrite: Optional[bool] = None,
+    path: str | None = None,
+    fail_if_exists: bool | None = None,
+    overwrite: bool | None = None,
 ) -> str:
     if overwrite is None:
         overwrite = bool(os.getenv("MYKE_UPDATE_MODULES"))
@@ -92,11 +94,11 @@ def install_module(
 
 
 def task(
-    func: Optional[Callable[..., Any]] = None,
+    func: Callable[..., Any] | None = None,
     *,
-    name: Optional[str] = None,
-    root: Optional[bool] = False,
-) -> Union[Callable[..., Any], Callable[..., Callable[..., Any]]]:
+    name: str | None = None,
+    root: bool | None = False,
+) -> Callable[..., Any] | Callable[..., Callable[..., Any]]:
 
     if not func:
         return partial(task, name=name, root=root)
@@ -113,22 +115,22 @@ def task(
 
 
 def task_sh(
-    func: Optional[Callable[..., Union[str, Sequence[str]]]] = None,
+    func: Callable[..., str | Sequence[str]] | None = None,
     *,
-    name: Optional[str] = None,
-    root: Optional[bool] = False,
-    capture_output: Optional[bool] = False,
-    echo: Optional[bool] = True,
-    check: Optional[bool] = True,
-    cwd: Optional[str] = None,
-    env: Optional[Dict[str, str]] = None,
-    env_update: Optional[Dict[str, str]] = None,
-    timeout: Optional[float] = None,
-    executable: Optional[str] = None,
-) -> Union[
-    Callable[..., Tuple[Optional[str], Optional[str], int]],
-    Callable[..., Callable[..., Tuple[Optional[str], Optional[str], int]]],
-]:
+    name: str | None = None,
+    root: bool | None = False,
+    capture_output: bool | None = False,
+    echo: bool | None = True,
+    check: bool | None = True,
+    cwd: str | None = None,
+    env: dict[str, str] | None = None,
+    env_update: dict[str, str] | None = None,
+    timeout: float | None = None,
+    executable: str | None = None,
+) -> (
+    Callable[..., tuple[str | None, str | None, int]]
+    | Callable[..., Callable[..., tuple[str | None, str | None, int]]]
+):
     if not func:
         return partial(
             task_sh,
@@ -145,12 +147,10 @@ def task_sh(
         )
 
     @wraps(func)
-    def _inner_func(
-        *args: Any, **kwargs: Any
-    ) -> Tuple[Optional[str], Optional[str], int]:
+    def _inner_func(*args: Any, **kwargs: Any) -> tuple[str | None, str | None, int]:
         assert func
 
-        func_script: Union[str, Sequence[str]] = func(*args, **kwargs)
+        func_script: str | Sequence[str] = func(*args, **kwargs)
 
         if not isinstance(func_script, str) and not isinstance(
             func_script, collections.abc.Sequence
@@ -178,22 +178,19 @@ def task_sh(
 
 
 def _task_sh_stdout_lines(
-    func: Optional[Callable[..., Union[str, Sequence[str]]]] = None,
+    func: Callable[..., str | Sequence[str]] | None = None,
     *,
-    name: Optional[str] = None,
-    root: Optional[bool] = False,
-    echo: Optional[bool] = False,
-    check: Optional[bool] = True,
-    cwd: Optional[str] = None,
-    env: Optional[Dict[str, str]] = None,
-    env_update: Optional[Dict[str, str]] = None,
-    timeout: Optional[float] = None,
-    executable: Optional[str] = None,
-    join_lines: Optional[bool] = False,
-) -> Union[
-    Callable[..., Union[str, List[str]]],
-    Callable[..., Callable[..., Union[str, List[str]]]],
-]:
+    name: str | None = None,
+    root: bool | None = False,
+    echo: bool | None = False,
+    check: bool | None = True,
+    cwd: str | None = None,
+    env: dict[str, str] | None = None,
+    env_update: dict[str, str] | None = None,
+    timeout: float | None = None,
+    executable: str | None = None,
+    join_lines: bool | None = False,
+) -> (Callable[..., str | list[str]] | Callable[..., Callable[..., str | list[str]]]):
     if not func:
         return partial(
             task_sh_stdout_lines,
@@ -209,7 +206,7 @@ def _task_sh_stdout_lines(
         )
 
     @wraps(func)
-    def _inner_func(*args: Any, **kwargs: Any) -> Union[str, List[str]]:
+    def _inner_func(*args: Any, **kwargs: Any) -> str | list[str]:
         assert func
         stdout, *_ = sh(
             func(*args, **kwargs),
@@ -223,7 +220,7 @@ def _task_sh_stdout_lines(
             executable=executable,
         )
 
-        stdout_split: List[str] = split_and_trim_text(stdout)
+        stdout_split: list[str] = split_and_trim_text(stdout)
 
         return os.linesep.join(stdout_split) if join_lines else stdout_split
 
@@ -236,13 +233,13 @@ def _task_sh_stdout_lines(
 @wraps(_task_sh_stdout_lines)
 def task_sh_stdout_lines(
     *args: Any, **kwargs: Any
-) -> Union[Callable[..., List[str]], Callable[..., Callable[..., List[str]]]]:
+) -> Callable[..., list[str]] | Callable[..., Callable[..., list[str]]]:
     return _task_sh_stdout_lines(*args, **kwargs)  # type: ignore
 
 
 @wraps(_task_sh_stdout_lines)
 def task_sh_stdout(
     *args: Any, **kwargs: Any
-) -> Union[Callable[..., str], Callable[..., Callable[..., str]]]:
+) -> Callable[..., str] | Callable[..., Callable[..., str]]:
     kwargs["join_lines"] = True
     return _task_sh_stdout_lines(*args, **kwargs)  # type: ignore
