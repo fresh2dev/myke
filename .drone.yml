@@ -10,9 +10,7 @@ data:
     {}
   domainTriggers: >-
     {
-      "lokalhost.net": {
-        "ref": ["refs/heads/dev", "refs/heads/main", "refs/tags/*"]
-      },
+      "lokalhost.net": {},
       "fresh2.dev": {
         "ref": ["refs/heads/main", "refs/tags/*"]
       }
@@ -46,7 +44,6 @@ data:
         "name": "build-reports",
         "image": "registry.lokalhost.net/fresh2dev/docker-myke:0.0.1a5.dev2",
         "commands": [
-          "pip install .",
           "myke py-requirements",
           "myke py-reports"
         ]
@@ -64,7 +61,6 @@ data:
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
-          "pip install .",
           "myke py-set-version --repository lokalhost",
           "myke py-requirements -e build",
           "myke py-build"
@@ -80,7 +76,6 @@ data:
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
-          "pip install .",
           "myke py-requirements -e build",
           "myke py-publish --repository lokalhost"
         ],
@@ -95,7 +90,6 @@ data:
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
-          "pip install .",
           "myke py-requirements -e build",
           "myke py-publish --repository codeberg"
         ],
@@ -112,7 +106,6 @@ data:
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
-          "pip install .",
           "myke py-requirements -e build",
           "myke py-publish --repository testpypi"
         ],
@@ -129,7 +122,6 @@ data:
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
-          "pip install .",
           "myke py-requirements -e build",
           "myke py-publish --repository pypi"
         ],
