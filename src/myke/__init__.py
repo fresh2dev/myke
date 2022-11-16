@@ -19,3 +19,27 @@ from .tasks import (
     task_sh_stdout,
     task_sh_stdout_lines,
 )
+
+__all__ = [
+    "__version__",
+    "TASKS",
+    "task",
+    "task_sh",
+    "task_sh_stdout",
+    "task_sh_stdout_lines",
+    "add_tasks",
+    "import_module",
+    "install_module",
+    "sh",
+    "sh_stdout",
+    "sh_stdout_lines",
+    "require",
+    "arg",
+    "main",
+    "read",
+    "write",
+    "utils",
+    "exceptions",
+    "cache",
+    "echo",
+]
