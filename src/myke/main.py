@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import sys
 from dataclasses import dataclass
+from inspect import getsource
 from typing import Any, Callable
 
 import yapx
@@ -33,7 +34,7 @@ def main(_file: str | None = None) -> None:
             env_var="MYKE_FILE_PATHS",
             group="myke args",
         )
-        env_file: str = yapx.arg(
+        env_file: None | str = yapx.arg(
             default=None,
             flags=["--myke-env-file"],
             env_var="MYKE_ENV_FILE",
@@ -56,6 +57,9 @@ def main(_file: str | None = None) -> None:
         )
         help: bool = yapx.arg(
             default=False, group="myke args", exclusive=True, flags=["--myke-help"]
+        )
+        explain: bool = yapx.arg(
+            default=False, group="myke args", exclusive=True, flags=["--myke-explain"]
         )
         version: bool = yapx.arg(
             default=False, group="myke args", exclusive=True, flags=["--myke-version"]
@@ -131,6 +135,23 @@ def main(_file: str | None = None) -> None:
             parser.exit()
 
     root_task: Callable[..., Any] | None = TASKS.pop(ROOT_TASK_KEY, None)
+
+    if myke_args.explain:
+        explain_this: None | Callable[..., Any] = None
+
+        if not task_args or task_args[0].startswith("-"):
+            explain_this = root_task
+            if explain_this is None:
+                echo("There is no root task. Provide a task name to explain.")
+        else:
+            explain_this = TASKS.get(task_args[0], None)
+            if explain_this is None:
+                echo(f"Given task name not found: {task_args[0]}")
+
+        if explain_this:
+            echo(getsource(explain_this))
+
+        parser.exit()
 
     if myke_args.help or (not task_args and not myke_args.task_help_all):
         parser.print_help()
