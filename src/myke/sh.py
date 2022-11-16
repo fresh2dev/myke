@@ -9,7 +9,7 @@ from typing import Any, Sequence
 from .exceptions import CalledProcessError
 from .utils import split_and_trim_text
 
-__all__ = ["sh", "sh_stdout", "sh_stdout_lines"]
+__all__ = ["sh", "sh_stdout", "sh_stdout_lines", "require"]
 
 
 def sh(
@@ -24,9 +24,11 @@ def sh(
     **kwargs: Any,
 ) -> tuple[str | None, str | None, int]:
 
+    if not isinstance(args, str):
+        args = " ".join(args)
+
     kwargs["cwd"] = cwd
     kwargs["timeout"] = timeout
-    kwargs["shell"] = kwargs.get("shell", True)
     kwargs["capture_output"] = capture_output
     kwargs["text"] = True
 
@@ -40,7 +42,9 @@ def sh(
 
     kwargs["env"] = env
 
-    p: subprocess.CompletedProcess[str] = subprocess.run(args, check=False, **kwargs)
+    p: subprocess.CompletedProcess[str] = subprocess.run(
+        args, shell=True, check=False, **kwargs
+    )
 
     if capture_output and echo:
         if p.stdout:
@@ -65,3 +69,21 @@ def sh_stdout_lines(*args: Any, **kwargs: Any) -> list[str]:
 @wraps(sh)
 def sh_stdout(*args: Any, **kwargs: Any) -> str:
     return os.linesep.join(sh_stdout_lines(*args, **kwargs))
+
+
+def require(*args: str, pip_args: list[str] | None = None, **kwargs: str) -> None:
+    if not pip_args:
+        pip_args = []
+
+    # 'mykefiles==0.0.1a3.dev2'
+    sh_stdout(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            *pip_args,
+            *args,
+            *[f"{k}=={v}" for k, v in kwargs.items()],
+        ],
+    )
