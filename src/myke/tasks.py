@@ -33,7 +33,7 @@ def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
         if v_existing:
             raise TaskAlreadyRegisteredError(
                 f"Failed to import module '{v.__module__}': "
-                f"Command '{k}' already defined from module '{v_existing.__module__}'"
+                f"Task '{k}' already defined from module '{v_existing.__module__}'"
             )
         TASKS[k] = v
 

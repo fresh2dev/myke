@@ -71,7 +71,7 @@ class echo:
             cls.text("No tasks found.")
         else:
             records: List[Dict[str, str]] = [
-                {"Command": k, "Source": v.__module__} for k, v in sorted(TASKS.items())
+                {"Task": k, "Source": v.__module__} for k, v in sorted(TASKS.items())
             ]
 
             if not prog:
