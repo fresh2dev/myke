@@ -75,7 +75,6 @@ def require(*args: str, pip_args: list[str] | None = None, **kwargs: str) -> Non
     if not pip_args:
         pip_args = []
 
-    # 'mykefiles==0.0.1a3.dev2'
     sh_stdout(
         [
             sys.executable,
