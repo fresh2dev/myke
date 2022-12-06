@@ -25,25 +25,25 @@ def main(_file: str | None = None) -> None:
         file: str = yapx.arg(
             default=_file if _file else DEFAULT_MYKEFILE,
             flags=["--myke-file"],
-            env_var="MYKE_FILE",
+            env="MYKE_FILE",
             group="myke args",
         )
         file_paths: list[str] = yapx.arg(
             default=lambda: [os.path.expanduser("~"), os.getcwd()],
             flags=["--myke-file-paths"],
-            env_var="MYKE_FILE_PATHS",
+            env="MYKE_FILE_PATHS",
             group="myke args",
         )
         env_file: None | str = yapx.arg(
             default=None,
             flags=["--myke-env-file"],
-            env_var="MYKE_ENV_FILE",
+            env="MYKE_ENV_FILE",
             group="myke args",
         )
         update_modules: bool = yapx.arg(
             default=False,
             flags=["--myke-update-modules"],
-            env_var="MYKE_UPDATE_MODULES",
+            env="MYKE_UPDATE_MODULES",
             group="myke args",
         )
         no_pydantic: bool = yapx.arg(
