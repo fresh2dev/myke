@@ -79,31 +79,28 @@ class write:
         cls.text(
             path=path,
             content="""#!/usr/bin/env python3
-    # type: ignore
+# type: ignore
+# pylint: skip-file
+# flake8: noqa
+import myke  # noqa
 
-    import myke
+myke.require(
+    "mykefiles==0.0.1a3.dev8",
+    pip_args=[
+        "--extra-index-url",
+        "https://codeberg.org/api/packages/Fresh2dev/pypi/simple",
+    ],
+)
+from mykefiles import hello_world  # noqa
+
+# @myke.task(root=True)
+# def setup():
+#     ...
 
 
-    @myke.task(root=True)
-    def setup() -> None:
-        print("charging lazer beamz")
-
-
-    @myke.task
-    def print_hello(
-        name = myke.arg(default="world", env_var="HELLO_NAME", flags=["-n", "--name"])
-    ):
-        print(f"hello {name}")
-
-    @myke.task_sh
-    def echo_hello(
-        name = myke.arg(default="world", env_var="HELLO_NAME", flags=["-n", "--name"])
-    ):
-        return f"echo 'hello {name}'"
-
-    if __name__ == "__main__":
-        myke.main(__file__)
-    """,
+if __name__ == "__main__":
+    myke.main(__file__)
+""",
         )
 
         make_executable(path)
