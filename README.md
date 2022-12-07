@@ -4,7 +4,7 @@
 | ------------- | ----------------------------------------- |
 | Repo          | https://codeberg.org/Fresh2dev/myke       |
 | Repo Mirror   | https://www.Fresh2.dev/code/r/myke        |
-| Documentation | https://www.Fresh2.dev/code/r/myke/i/docs |
+| Documentation | https://www.Fresh2.dev/code/r/myke/i |
 | Funding       | https://www.Fresh2.dev/tip                |
 
 ---
