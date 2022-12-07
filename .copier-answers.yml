@@ -1,12 +1,16 @@
 # Changes here will be overwritten by Copier
-_commit: 43914ba
-_src_path: https://codeberg.org/fresh2dev/copier-python.git
-author_email: hello@fresh2.dev
+_commit: 32fe56c
+_src_path: https://codeberg.org/Fresh2dev/copier-python.git
+author_email: hello@Fresh2.dev
 author_name: donald
 ci_domain_name: lokalhost.net
-docs_url: https://www.Fresh2.dev/code/r/myke/i
+docs_url: https://www.Fresh2.dev/code/r/myke/i/docs
 funding_url: https://www.Fresh2.dev/tip
+home_page: https://www.Fresh2.dev
+is_python: true
 package_name: myke
 project_name: myke
 python_version: '3.7'
+repo_mirror: https://www.Fresh2.dev/code/r/myke
+repo_owner: Fresh2dev
 repo_url: https://codeberg.org/Fresh2dev/myke
