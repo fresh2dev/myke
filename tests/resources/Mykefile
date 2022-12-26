@@ -2,7 +2,7 @@
 # type: ignore
 
 import os
-from typing import List, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 import myke
 
@@ -105,6 +105,14 @@ def hello_check():
 @myke.task_sh(timeout=1)
 def hello_timeout():
     return "sleep 2s"
+
+@myke.task
+def print_args(args: Optional[List[str]] = myke.arg(pos=True)):
+    myke.echo(args)
+
+@myke.task
+def print_kwargs(kwargs: Optional[Dict[str, str]] = myke.arg(pos=True)):
+    myke.echo(kwargs)
 
 
 @myke.task

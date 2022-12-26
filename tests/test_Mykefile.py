@@ -159,15 +159,15 @@ def test_Mykefile_assert_types(capsys, resources_dir: str):
         "3.14",
         "--xbool",
         "--xliststr",
-        "this,that",
-        "another",
+        "[this that",
+        "another]",
         "--xsetint",
-        "1, 1",
-        "1, 2",
-        "3",
+        "[1 1",
+        "1 2",
+        "3]",
         "--xtuplefloat",
-        "3.14",
-        "6.28, 9.42",
+        "[3.14",
+        "6.28 9.42]",
     ]
 
     _ = _common(capsys, resources_dir, cli_args=cli_args, expected_txt=None)
