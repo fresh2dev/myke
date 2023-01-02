@@ -95,6 +95,12 @@ from mykefiles import hello_world  # noqa
 
 # @myke.task(root=True)
 # def setup():
+#     # setup
+#     ...
+#
+#     yield
+#
+#     # teardown
 #     ...
 
 
