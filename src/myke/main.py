@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import sys
 from dataclasses import dataclass
+from fnmatch import fnmatch
 from inspect import getsource
 from typing import Any, Callable
 
@@ -157,6 +158,14 @@ def main(_file: str | None = None) -> None:
         parser.print_help()
         echo.tasks(prog=prog)
         parser.exit()
+
+    if task_args and "*" in task_args[0]:
+        for k in list(TASKS):
+            if not fnmatch(k, task_args[0]):
+                del TASKS[k]
+        if not myke_args.task_help_all:
+            echo.tasks(prog=prog)
+            parser.exit()
 
     if myke_args.task_help:
         task_args.append("--help")

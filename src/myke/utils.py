@@ -6,10 +6,11 @@ import stat
 from importlib.machinery import SourceFileLoader
 from typing import Any
 
-from yapx.utils import convert_to_command_string
+from yapx.utils import convert_to_command_string, parse_sequence
 
 __all__ = [
     "convert_to_command_string",
+    "parse_sequence",
     "make_executable",
     "is_version",
 ]
