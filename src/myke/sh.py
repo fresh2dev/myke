@@ -9,10 +9,10 @@ from typing import Any, Sequence
 from .exceptions import CalledProcessError
 from .utils import split_and_trim_text
 
-__all__ = ["sh", "sh_stdout", "sh_stdout_lines", "require"]
+__all__ = ["run", "sh", "sh_stdout", "sh_stdout_lines", "require"]
 
 
-def sh(
+def run(
     args: str | Sequence[str],
     capture_output: None | bool = False,
     echo: bool | None = True,
@@ -21,11 +21,12 @@ def sh(
     env: dict[str, str] | None = None,
     env_update: dict[str, str] | None = None,
     timeout: float | None = None,
+    shell: bool | None = None,
     **kwargs: Any,
 ) -> tuple[str | None, str | None, int]:
 
-    if not isinstance(args, str):
-        args = " ".join(args)
+    if shell is None:
+        shell = isinstance(args, str)
 
     kwargs["cwd"] = cwd
     kwargs["timeout"] = timeout
@@ -43,7 +44,7 @@ def sh(
     kwargs["env"] = env
 
     p: subprocess.CompletedProcess[str] = subprocess.run(
-        args, shell=True, check=False, **kwargs
+        args, shell=shell, check=False, **kwargs
     )
 
     if capture_output and echo:
@@ -56,6 +57,12 @@ def sh(
         raise CalledProcessError(p.returncode, p.args, p.stdout, p.stderr)
 
     return p.stdout, p.stderr, p.returncode
+
+
+@wraps(run)
+def sh(*args: Any, **kwargs: Any) -> tuple[str | None, str | None, int]:
+    kwargs["shell"] = True
+    return run(*args, **kwargs)
 
 
 @wraps(sh)
@@ -75,7 +82,7 @@ def require(*args: str, pip_args: list[str] | None = None, **kwargs: str) -> Non
     if not pip_args:
         pip_args = []
 
-    sh_stdout(
+    run(
         [
             sys.executable,
             "-m",
@@ -85,4 +92,6 @@ def require(*args: str, pip_args: list[str] | None = None, **kwargs: str) -> Non
             *args,
             *[f"{k}=={v}" for k, v in kwargs.items()],
         ],
+        echo=False,
+        capture_output=False,
     )

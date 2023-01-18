@@ -22,11 +22,11 @@ class echo:
     @classmethod
     def lines(
         cls,
-        seq: Sequence[str],
+        seq: Sequence[Optional[str]],
         linesep: str = os.linesep,
         print_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
-        cls._print(linesep.join(seq), print_kwargs=print_kwargs)
+        cls._print(linesep.join([str(x) for x in seq]), print_kwargs=print_kwargs)
 
     @classmethod
     def json(
