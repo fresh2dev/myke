@@ -53,8 +53,8 @@ def main(_file: str | None = None) -> None:
         task_help: bool = yapx.arg(
             default=False, group="myke args", exclusive=True, flags=["-h", "--help"]
         )
-        task_help_all: bool = yapx.arg(
-            default=False, group="myke args", exclusive=True, flags=["--help-all"]
+        task_help_full: bool = yapx.arg(
+            default=False, group="myke args", exclusive=True, flags=["--help-full"]
         )
         help: bool = yapx.arg(
             default=False, group="myke args", exclusive=True, flags=["--myke-help"]
@@ -154,7 +154,7 @@ def main(_file: str | None = None) -> None:
 
         parser.exit()
 
-    if myke_args.help or (not task_args and not myke_args.task_help_all):
+    if myke_args.help or (not task_args and not myke_args.task_help_full):
         parser.print_help()
         echo.tasks(prog=prog)
         parser.exit()
@@ -163,7 +163,7 @@ def main(_file: str | None = None) -> None:
         for k in list(TASKS):
             if not fnmatch(k, task_args[0]):
                 del TASKS[k]
-        if not myke_args.task_help_all:
+        if not myke_args.task_help_full:
             echo.tasks(prog=prog)
             parser.exit()
 
@@ -174,7 +174,7 @@ def main(_file: str | None = None) -> None:
         root_task,
         _args=task_args,
         _prog=prog,
-        _print_help=myke_args.task_help_all,
+        _print_help=myke_args.task_help_full,
         _use_pydantic=(not myke_args.no_pydantic),
         **TASKS,
     )
