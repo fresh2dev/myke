@@ -52,7 +52,7 @@ class write:
     @classmethod
     def lines(
         cls,
-        content: List[str],
+        content: List[Optional[str]],
         path: str,
         append: bool = False,
         overwrite: bool = False,
@@ -62,7 +62,7 @@ class write:
             raise TypeError("expected a list of strings, not a string")
         cls.text(
             path=path,
-            content=os.linesep.join(content),
+            content=os.linesep.join([str(x) for x in content]),
             append=append,
             overwrite=overwrite,
             **kwargs
