@@ -165,8 +165,8 @@ def test_echo_text(capsys):
 
 
 def test_echo_lines(capsys):
-    test_input: List[str] = ["hello", "world"]
-    expected: str = os.linesep.join(test_input) + os.linesep
+    test_input: List[str] = ["hello", None, "world", None]
+    expected: str = os.linesep.join([str(x) for x in test_input]) + os.linesep
 
     myke.echo.lines(test_input)
 
