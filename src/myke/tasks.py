@@ -20,7 +20,6 @@ from .utils import (
 
 
 def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
-
     kwargs.update({x.__name__: x for x in args})
 
     kwargs = {
@@ -99,7 +98,6 @@ def task(
     name: str | None = None,
     root: bool | None = False,
 ) -> Callable[..., Any] | Callable[..., Callable[..., Any]]:
-
     if not func:
         return partial(task, name=name, root=root)
 
@@ -190,7 +188,7 @@ def _task_sh_stdout_lines(
     timeout: float | None = None,
     executable: str | None = None,
     join_lines: bool | None = False,
-) -> (Callable[..., str | list[str]] | Callable[..., Callable[..., str | list[str]]]):
+) -> Callable[..., str | list[str]] | Callable[..., Callable[..., str | list[str]]]:
     if not func:
         return partial(
             task_sh_stdout_lines,

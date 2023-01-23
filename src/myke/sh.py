@@ -24,7 +24,6 @@ def run(
     shell: bool | None = None,
     **kwargs: Any,
 ) -> tuple[str | None, str | None, int]:
-
     if shell is None:
         shell = isinstance(args, str)
 
@@ -39,7 +38,11 @@ def run(
         env = os.environ.copy()
 
     if env_update:
-        env.update(env_update)
+        for k, v in env_update.items():
+            if v is None:
+                env.pop(k)
+            else:
+                env[k] = v
 
     kwargs["env"] = env
 
