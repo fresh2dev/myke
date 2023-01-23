@@ -14,9 +14,10 @@ def test_main_version(capsys: CaptureFixture, version_regex: Pattern):
     args: List[str] = ["--myke-version"]
 
     # 2. ACT
-    with mock.patch.object(target_sys, "argv", [""] + args):
-        with pytest.raises(SystemExit) as pexit:
-            myke.main()
+    with mock.patch.object(target_sys, "argv", [""] + args), pytest.raises(
+        SystemExit
+    ) as pexit:
+        myke.main()
 
     # 3. ASSERT
     captured: CaptureResult = capsys.readouterr()
@@ -31,9 +32,10 @@ def test_main_help(capsys: CaptureFixture):
     args: List[str] = ["--myke-help"]
 
     # 2. ACT
-    with mock.patch.object(target_sys, "argv", [""] + args):
-        with pytest.raises(SystemExit) as pexit:
-            myke.main()
+    with mock.patch.object(target_sys, "argv", [""] + args), pytest.raises(
+        SystemExit
+    ) as pexit:
+        myke.main()
 
     # 3. ASSERT
     captured: CaptureResult = capsys.readouterr()
@@ -56,9 +58,10 @@ def test_main_explain(capsys: CaptureFixture, resources_dir: str):
     # 2. ACT
     myke.import_module(mykefile)
 
-    with mock.patch.object(target_sys, "argv", [""] + args):
-        with pytest.raises(SystemExit) as pexit:
-            myke.main(mykefile)
+    with mock.patch.object(target_sys, "argv", [""] + args), pytest.raises(
+        SystemExit
+    ) as pexit:
+        myke.main(mykefile)
 
     # 3. ASSERT
     captured: CaptureResult = capsys.readouterr()

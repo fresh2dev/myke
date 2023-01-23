@@ -25,6 +25,7 @@ class write:
         path: str,
         append: bool = False,
         overwrite: bool = False,
+        encoding: str = "utf-8",
         **kwargs: Any
     ) -> None:
         mode_default: str = "w"
@@ -46,7 +47,7 @@ class write:
             if not os.path.exists(path):
                 mode += "+"
 
-        with open(path, mode=mode, **kwargs) as f:
+        with open(path, mode=mode, encoding=encoding, **kwargs) as f:
             f.write(content)
 
     @classmethod
