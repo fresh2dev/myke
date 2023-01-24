@@ -25,17 +25,9 @@ def run(
     **kwargs: Any,
 ) -> tuple[str | None, str | None, int]:
     if shell is None:
-        shell = isinstance(args, str)
+        shell = isinstance(args, str) and " " in args
 
-    kwargs["cwd"] = cwd
-    kwargs["timeout"] = timeout
-    kwargs["capture_output"] = capture_output
-    kwargs["text"] = True
-
-    if env:
-        env = env.copy()
-    else:
-        env = os.environ.copy()
+    env = env.copy() if env else os.environ.copy()
 
     if env_update:
         for k, v in env_update.items():
@@ -44,17 +36,26 @@ def run(
             else:
                 env[k] = v
 
-    kwargs["env"] = env
+    if not echo and not capture_output:
+        for k in ("stdout", "stderr"):
+            kwargs[k] = subprocess.DEVNULL
 
     p: subprocess.CompletedProcess[str] = subprocess.run(
-        args, shell=shell, check=False, **kwargs
+        args,
+        shell=shell,
+        env=env,
+        cwd=cwd,
+        timeout=timeout,
+        capture_output=bool(capture_output),
+        text=capture_output,
+        check=False,
+        **kwargs,
     )
 
-    if capture_output and echo:
-        if p.stdout:
-            print(p.stdout.rstrip(os.linesep))
-        if p.stderr:
-            print(p.stderr.rstrip(os.linesep))
+    if echo and capture_output:
+        for out in (p.stdout, p.stderr):
+            if out:
+                print(out.rstrip(os.linesep))
 
     if check and p.returncode:
         raise CalledProcessError(p.returncode, p.args, p.stdout, p.stderr)
@@ -81,11 +82,13 @@ def sh_stdout(*args: Any, **kwargs: Any) -> str:
     return os.linesep.join(sh_stdout_lines(*args, **kwargs))
 
 
-def require(*args: str, pip_args: list[str] | None = None, **kwargs: str) -> None:
+def require(
+    *args: str, pip_args: list[str] | None = None, **kwargs: str
+) -> tuple[str | None, str | None, int]:
     if not pip_args:
         pip_args = []
 
-    run(
+    return run(
         [
             sys.executable,
             "-m",
@@ -96,5 +99,5 @@ def require(*args: str, pip_args: list[str] | None = None, **kwargs: str) -> Non
             *[f"{k}=={v}" for k, v in kwargs.items()],
         ],
         echo=False,
-        capture_output=False,
+        capture_output=True,
     )
