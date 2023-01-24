@@ -47,9 +47,6 @@ def main(_file: str | None = None) -> None:
             env="MYKE_UPDATE_MODULES",
             group="myke args",
         )
-        no_pydantic: bool = yapx.arg(
-            default=False, group="myke args", flags=["--myke-no-pydantic"]
-        )
         task_help: bool = yapx.arg(
             default=False, group="myke args", exclusive=True, flags=["-h", "--help"]
         )
@@ -81,7 +78,7 @@ def main(_file: str | None = None) -> None:
     myke_args: MykeArgs
     task_args: list[str]
     myke_args, task_args = parser.parse_known_args_to_model(
-        sys.argv[1:], args_model=MykeArgs, use_pydantic=False
+        sys.argv[1:], args_model=MykeArgs, skip_pydantic_validation=True
     )
     assert isinstance(myke_args, MykeArgs)
 
@@ -175,6 +172,5 @@ def main(_file: str | None = None) -> None:
         _args=task_args,
         _prog=prog,
         _print_help=myke_args.task_help_full,
-        _use_pydantic=(not myke_args.no_pydantic),
         **TASKS,
     )
