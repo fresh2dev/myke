@@ -83,7 +83,7 @@ def sh_stdout(*args: Any, **kwargs: Any) -> str:
 
 
 def require(
-    *args: str, pip_args: list[str] | None = None, **kwargs: str
+    *args: str, pip_args: list[str] | None = None, echo: bool = False, **kwargs: str
 ) -> tuple[str | None, str | None, int]:
     if not pip_args:
         pip_args = []
@@ -98,6 +98,6 @@ def require(
             *args,
             *[f"{k}=={v}" for k, v in kwargs.items()],
         ],
-        echo=False,
+        echo=echo,
         capture_output=True,
     )
