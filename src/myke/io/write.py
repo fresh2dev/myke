@@ -86,11 +86,11 @@ class write:
 import myke  # noqa
 
 myke.require(
-    "mykefiles==0.0.1a3.dev16",
     pip_args=[
         "--extra-index-url",
         "https://codeberg.org/api/packages/Fresh2dev/pypi/simple",
     ],
+    mykefiles="0.0.1a3.dev23",
 )
 from mykefiles import hello_world  # noqa
 
