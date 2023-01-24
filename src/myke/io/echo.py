@@ -79,7 +79,7 @@ class echo:
 
             try:
                 if not tablefmt:
-                    tablefmt = "github"
+                    tablefmt = "rst"
                 echo.table(records, tablefmt=tablefmt)
             except ModuleNotFoundError:
                 cls.text("TASKS")
