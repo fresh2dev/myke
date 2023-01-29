@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 import sys
@@ -82,8 +83,12 @@ def sh_stdout(*args: Any, **kwargs: Any) -> str:
     return os.linesep.join(sh_stdout_lines(*args, **kwargs))
 
 
-def require(
-    *args: str, pip_args: list[str] | None = None, **kwargs: str
+def _run_pip(
+    *args: str,
+    pip_args: list[str] | None = None,
+    echo: bool = False,
+    capture_output: bool = False,
+    **kwargs: str,
 ) -> tuple[str | None, str | None, int]:
     if not pip_args:
         pip_args = []
@@ -98,6 +103,46 @@ def require(
             *args,
             *[f"{k}=={v}" for k, v in kwargs.items()],
         ],
+        echo=echo,
+        capture_output=capture_output,
+    )
+
+
+def require(
+    *args: str,
+    pip_args: list[str] | None = None,
+    skip_check: bool = False,
+    **kwargs: str,
+) -> tuple[str | None, str | None, int]:
+    if not pip_args:
+        pip_args = []
+
+    dry_run_args: list[str] = (
+        [] if skip_check else ["-qq", "--dry-run", "--report", "-"]
+    )
+
+    stdout, stderr, returncode = _run_pip(
+        *args,
+        pip_args=pip_args + dry_run_args,
         echo=False,
         capture_output=True,
+        **kwargs,
     )
+
+    if dry_run_args:
+        if not stdout or returncode != 0:
+            print(stdout, stderr, returncode)
+            return stdout, stderr, returncode
+
+        result: dict[str, Any] = json.loads(stdout)
+
+        if result and result.get("install"):
+            return _run_pip(
+                *args,
+                pip_args=pip_args,
+                echo=True,
+                capture_output=False,
+                **kwargs,
+            )
+
+    return stdout, stderr, returncode
