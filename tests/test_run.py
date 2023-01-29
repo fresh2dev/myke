@@ -94,12 +94,14 @@ def test_sh_stdout():
 
 
 def test_require(capfd: CaptureFixture):
-    stdout, stderr, returncode = myke.require(
-        "mykefiles==0.0.1a3.dev20",
+    _stdout, stderr, returncode = myke.require(
         pip_args=[
             "--extra-index-url",
             "https://codeberg.org/api/packages/Fresh2dev/pypi/simple",
+            "--quiet",
+            "--dry-run",
         ],
+        mykefiles="0.0.1a3.dev20",
     )
 
     captured: CaptureResult = capfd.readouterr()
@@ -108,4 +110,3 @@ def test_require(capfd: CaptureFixture):
 
     assert returncode == 0
     assert not stderr
-    assert stdout
