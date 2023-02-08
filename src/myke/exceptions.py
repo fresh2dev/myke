@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import subprocess
 
 
@@ -27,8 +26,7 @@ class CalledProcessError(subprocess.CalledProcessError):
             for attr in "stdout", "stderr":
                 attr_value: str = getattr(self, attr)
                 if attr_value:
-                    attr_value.rstrip(os.linesep)
-                else:
-                    attr_value = ""
-                msg += f"{os.linesep+attr}:{os.linesep+attr_value}"
+                    attr_value_trimmed: str = attr_value.rstrip("\n")
+                    if attr_value_trimmed:
+                        msg += f"\n{attr}:\n{attr_value_trimmed}"
             return msg
