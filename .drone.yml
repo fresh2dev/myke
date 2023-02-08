@@ -1,13 +1,8 @@
 kind: template
 load: hostbutter.jsonnet
 data:
-  projectName: ${DRONE_REPO}
-  gitSshKey: default
-  ciImageRegistry: "registry.lokalhost.net"
   domains: >-
     ["lokalhost.net", "fresh2.dev"]
-  domainContexts: >-
-    {}
   domainTriggers: >-
     {
       "lokalhost.net": {},
@@ -15,14 +10,9 @@ data:
         "ref": ["refs/heads/main", "refs/tags/*"]
       }
     }
-  pushRemotes: >-
+  domainClusterMap: >-
     {}
-  imageTags: ""
-  useDinD: false
   dockerHubUser: ""
-  deployStack: true
-  deployCommands: >-
-    {}
   secrets: >-
     []
   secretFiles: >-
@@ -31,8 +21,6 @@ data:
     }
   volumes: >-
     []
-  domainVars: >-
-    {}
   beforeSteps: >-
     [
       {

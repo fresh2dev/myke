@@ -33,7 +33,7 @@ def run(
     if env_update:
         for k, v in env_update.items():
             if v is None:
-                env.pop(k)
+                env.pop(k, None)
             else:
                 env[k] = v
 
