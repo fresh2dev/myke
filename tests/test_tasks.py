@@ -13,7 +13,7 @@ def test_import_module(clean_dir):
 
     myke.import_module(
         "https://codeberg.org/fresh2dev/mykefiles/raw/branch/dev/src/mykefiles/"
-        + file_name
+        + file_name,
     )
     with pytest.raises(FileExistsError):
         myke.install_module(

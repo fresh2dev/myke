@@ -13,10 +13,14 @@ class write:
         path: str,
         append: bool = False,
         overwrite: bool = False,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None:
         cls.text(
-            content=content, path=path, append=append, overwrite=overwrite, **kwargs
+            content=content,
+            path=path,
+            append=append,
+            overwrite=overwrite,
+            **kwargs,
         )
 
     @staticmethod
@@ -26,7 +30,7 @@ class write:
         append: bool = False,
         overwrite: bool = False,
         encoding: str = "utf-8",
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None:
         mode_default: str = "w"
 
@@ -57,7 +61,7 @@ class write:
         path: str,
         append: bool = False,
         overwrite: bool = False,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None:
         if isinstance(content, str):
             raise TypeError("expected a list of strings, not a string")
@@ -66,7 +70,7 @@ class write:
             content=os.linesep.join([str(x) for x in content]),
             append=append,
             overwrite=overwrite,
-            **kwargs
+            **kwargs,
         )
 
     @classmethod
@@ -119,7 +123,7 @@ if __name__ == "__main__":
         path: Optional[str] = None,
         append: bool = False,
         overwrite: bool = False,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> str:
         if not path:
             path = os.getcwd()

@@ -48,22 +48,40 @@ def main(_file: str | None = None) -> None:
             group="myke args",
         )
         task_help: bool = yapx.arg(
-            default=False, group="myke args", exclusive=True, flags=["-h", "--help"]
+            default=False,
+            group="myke args",
+            exclusive=True,
+            flags=["-h", "--help"],
         )
         task_help_full: bool = yapx.arg(
-            default=False, group="myke args", exclusive=True, flags=["--help-full"]
+            default=False,
+            group="myke args",
+            exclusive=True,
+            flags=["--help-full"],
         )
         help: bool = yapx.arg(
-            default=False, group="myke args", exclusive=True, flags=["--myke-help"]
+            default=False,
+            group="myke args",
+            exclusive=True,
+            flags=["--myke-help"],
         )
         explain: bool = yapx.arg(
-            default=False, group="myke args", exclusive=True, flags=["--myke-explain"]
+            default=False,
+            group="myke args",
+            exclusive=True,
+            flags=["--myke-explain"],
         )
         version: bool = yapx.arg(
-            default=False, group="myke args", exclusive=True, flags=["--myke-version"]
+            default=False,
+            group="myke args",
+            exclusive=True,
+            flags=["--myke-version"],
         )
         create: bool = yapx.arg(
-            default=False, group="myke args", exclusive=True, flags=["--myke-create"]
+            default=False,
+            group="myke args",
+            exclusive=True,
+            flags=["--myke-create"],
         )
 
     prog: str = _file if _file else MYKE_VAR_NAME
@@ -78,7 +96,9 @@ def main(_file: str | None = None) -> None:
     myke_args: MykeArgs
     task_args: list[str]
     myke_args, task_args = parser.parse_known_args_to_model(
-        sys.argv[1:], args_model=MykeArgs, skip_pydantic_validation=True
+        sys.argv[1:],
+        args_model=MykeArgs,
+        skip_pydantic_validation=True,
     )
     assert isinstance(myke_args, MykeArgs)
 
@@ -124,11 +144,13 @@ def main(_file: str | None = None) -> None:
         except FileNotFoundError:
             parser.print_help()
             echo(
-                f"{os.linesep}"
-                f"'{myke_args.file}' not found. Create it using:"
-                f"{os.linesep}"
-                f"> {prog} --myke-create --myke-file '{f}'"
-                f"{os.linesep}"
+                (
+                    f"{os.linesep}"
+                    f"'{myke_args.file}' not found. Create it using:"
+                    f"{os.linesep}"
+                    f"> {prog} --myke-create --myke-file '{f}'"
+                    f"{os.linesep}"
+                ),
             )
             parser.exit()
 
