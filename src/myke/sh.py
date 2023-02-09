@@ -20,7 +20,7 @@ def run(
     check: bool | None = True,
     cwd: str | None = None,
     env: dict[str, str] | None = None,
-    env_update: dict[str, str] | None = None,
+    env_update: dict[str, str | None] | None = None,
     timeout: float | None = None,
     shell: bool | None = None,
     **kwargs: Any,

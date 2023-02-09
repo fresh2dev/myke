@@ -10,7 +10,10 @@ from myke import sh_stdout
 
 
 def _common(
-    capsys, resources_dir: str, cli_args: List[str], expected_txt: Union[str, List[str]]
+    capsys,
+    resources_dir: str,
+    cli_args: List[str],
+    expected_txt: Union[str, List[str]],
 ):
     # 1. ARRANGE
     import myke
