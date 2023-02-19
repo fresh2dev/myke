@@ -1,11 +1,13 @@
+import sys
+
 # import urllib.request
 from functools import partial, wraps
 from typing import Any, Callable, Dict, List
 
-try:
-    from typing_extensions import TypeGuard
-except ImportError:
+if sys.version_info >= (3, 10):
     from typing import TypeGuard
+else:
+    from typing_extensions import TypeGuard
 
 
 class read(str):
@@ -20,7 +22,9 @@ class read(str):
 
     @classmethod
     def _read_simple_dict(
-        cls, reader: Callable[..., Any], **kwargs: Any
+        cls,
+        reader: Callable[..., Any],
+        **kwargs: Any,
     ) -> Dict[str, Any]:
         content: Any = reader(**kwargs)
         if not cls._is_simple_dict(content):
@@ -52,7 +56,7 @@ class read(str):
         import yaml as _yaml
 
         return cls._read_simple_dict(
-            partial(_yaml.safe_load, cls.text(*args, **kwargs))
+            partial(_yaml.safe_load, cls.text(*args, **kwargs)),
         )
 
     @classmethod
@@ -103,7 +107,7 @@ class read(str):
         from dotenv import dotenv_values
 
         return cls._read_simple_dict(
-            partial(dotenv_values, stream=StringIO(cls.text(*args, **kwargs)))
+            partial(dotenv_values, stream=StringIO(cls.text(*args, **kwargs))),
         )
 
     @classmethod
@@ -119,7 +123,10 @@ class read(str):
         method: str = kwargs.pop("method", "GET")
         timeout: float = kwargs.pop("timeout", 10)
         resp: requests.Response = requests.request(
-            method=method, url=addr, timeout=timeout, **kwargs
+            method=method,
+            url=addr,
+            timeout=timeout,
+            **kwargs,
         )
         return resp
 
