@@ -15,7 +15,7 @@ def test_main_version(capsys: CaptureFixture, version_regex: Pattern):
 
     # 2. ACT
     with mock.patch.object(target_sys, "argv", [""] + args), pytest.raises(
-        SystemExit
+        SystemExit,
     ) as pexit:
         myke.main()
 
@@ -33,7 +33,7 @@ def test_main_help(capsys: CaptureFixture):
 
     # 2. ACT
     with mock.patch.object(target_sys, "argv", [""] + args), pytest.raises(
-        SystemExit
+        SystemExit,
     ) as pexit:
         myke.main()
 
@@ -59,7 +59,7 @@ def test_main_explain(capsys: CaptureFixture, resources_dir: str):
     myke.import_module(mykefile)
 
     with mock.patch.object(target_sys, "argv", [""] + args), pytest.raises(
-        SystemExit
+        SystemExit,
     ) as pexit:
         myke.main(mykefile)
 

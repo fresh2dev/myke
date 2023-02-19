@@ -31,8 +31,10 @@ def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
         v_existing: Callable[..., Any] | None = TASKS.get(k, None)
         if v_existing:
             raise TaskAlreadyRegisteredError(
-                f"Failed to import module '{v.__module__}': "
-                f"Task '{k}' already defined from module '{v_existing.__module__}'"
+                (
+                    f"Failed to import module '{v.__module__}': "
+                    f"Task '{k}' already defined from module '{v_existing.__module__}'"
+                ),
             )
         TASKS[k] = v
 
@@ -122,7 +124,7 @@ def task_sh(
     check: bool | None = True,
     cwd: str | None = None,
     env: dict[str, str] | None = None,
-    env_update: dict[str, str] | None = None,
+    env_update: dict[str, str | None] | None = None,
     timeout: float | None = None,
     executable: str | None = None,
 ) -> (
@@ -151,10 +153,11 @@ def task_sh(
         func_script: str | Sequence[str] = func(*args, **kwargs)
 
         if not isinstance(func_script, str) and not isinstance(
-            func_script, collections.abc.Sequence
+            func_script,
+            collections.abc.Sequence,
         ):
             raise TypeError(
-                "Expected a string or list of strings to be returned for `sh` function"
+                "Expected a string or list of strings to be returned for `sh` function",
             )
 
         return sh(
@@ -184,7 +187,7 @@ def _task_sh_stdout_lines(
     check: bool | None = True,
     cwd: str | None = None,
     env: dict[str, str] | None = None,
-    env_update: dict[str, str] | None = None,
+    env_update: dict[str, str | None] | None = None,
     timeout: float | None = None,
     executable: str | None = None,
     join_lines: bool | None = False,
@@ -230,14 +233,16 @@ def _task_sh_stdout_lines(
 
 @wraps(_task_sh_stdout_lines)
 def task_sh_stdout_lines(
-    *args: Any, **kwargs: Any
+    *args: Any,
+    **kwargs: Any,
 ) -> Callable[..., list[str]] | Callable[..., Callable[..., list[str]]]:
     return _task_sh_stdout_lines(*args, **kwargs)  # type: ignore
 
 
 @wraps(_task_sh_stdout_lines)
 def task_sh_stdout(
-    *args: Any, **kwargs: Any
+    *args: Any,
+    **kwargs: Any,
 ) -> Callable[..., str] | Callable[..., Callable[..., str]]:
     kwargs["join_lines"] = True
     return _task_sh_stdout_lines(*args, **kwargs)  # type: ignore

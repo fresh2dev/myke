@@ -49,7 +49,9 @@ def test_run_no_echo(capfd: CaptureFixture):
 def test_run_capture_no_echo(capfd: CaptureFixture):
     expected: str = "hello world"
     stdout, stderr, returncode = myke.run(
-        f'echo "{expected}"', capture_output=True, echo=False
+        f'echo "{expected}"',
+        capture_output=True,
+        echo=False,
     )
 
     captured: CaptureResult = capfd.readouterr()

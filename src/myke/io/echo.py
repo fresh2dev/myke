@@ -30,7 +30,10 @@ class echo:
 
     @classmethod
     def json(
-        cls, obj: Any, print_kwargs: Optional[Dict[str, Any]] = None, **kwargs: Any
+        cls,
+        obj: Any,
+        print_kwargs: Optional[Dict[str, Any]] = None,
+        **kwargs: Any,
     ) -> None:
         import json as _json
 
@@ -57,7 +60,10 @@ class echo:
 
     @classmethod
     def pretty(
-        cls, obj: Any, print_kwargs: Optional[Dict[str, Any]] = None, **kwargs: Any
+        cls,
+        obj: Any,
+        print_kwargs: Optional[Dict[str, Any]] = None,
+        **kwargs: Any,
     ) -> None:
         from pprint import pformat
 
