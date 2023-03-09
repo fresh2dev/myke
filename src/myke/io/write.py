@@ -94,7 +94,7 @@ myke.require(
         "--extra-index-url",
         "https://codeberg.org/api/packages/Fresh2dev/pypi/simple",
     ],
-    mykefiles="0.0.1a3.dev23",
+    mykefiles="0.0.1a3.dev44",
 )
 from mykefiles import hello_world  # noqa
 
