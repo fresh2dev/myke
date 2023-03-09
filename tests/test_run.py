@@ -103,7 +103,7 @@ def test_require(capfd: CaptureFixture):
             "--quiet",
             "--dry-run",
         ],
-        mykefiles="0.0.1a3.dev20",
+        mykefiles="0.0.1a3.dev44",
     )
 
     captured: CaptureResult = capfd.readouterr()
