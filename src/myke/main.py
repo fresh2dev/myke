@@ -47,38 +47,38 @@ def main(_file: str | None = None) -> None:
             env="MYKE_UPDATE_MODULES",
             group="myke args",
         )
-        task_help: bool = yapx.arg(
-            default=False,
+        task_help: bool | None = yapx.arg(
+            default=None,
             group="myke args",
             exclusive=True,
             flags=["-h", "--help"],
         )
-        task_help_full: bool = yapx.arg(
-            default=False,
+        task_help_full: bool | None = yapx.arg(
+            default=None,
             group="myke args",
             exclusive=True,
             flags=["--help-full"],
         )
-        help: bool = yapx.arg(
-            default=False,
+        help: bool | None = yapx.arg(
+            default=None,
             group="myke args",
             exclusive=True,
             flags=["--myke-help"],
         )
-        explain: bool = yapx.arg(
-            default=False,
+        explain: bool | None = yapx.arg(
+            default=None,
             group="myke args",
             exclusive=True,
             flags=["--myke-explain"],
         )
-        version: bool = yapx.arg(
-            default=False,
+        version: bool | None = yapx.arg(
+            default=None,
             group="myke args",
             exclusive=True,
             flags=["--myke-version"],
         )
-        create: bool = yapx.arg(
-            default=False,
+        create: bool | None = yapx.arg(
+            default=None,
             group="myke args",
             exclusive=True,
             flags=["--myke-create"],
