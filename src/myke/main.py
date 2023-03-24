@@ -1,11 +1,9 @@
-from __future__ import annotations
-
 import os
 import sys
 from dataclasses import dataclass
 from fnmatch import fnmatch
 from inspect import getsource
-from typing import Any, Callable
+from typing import Any, Callable, List, Optional
 
 import yapx
 
@@ -17,72 +15,107 @@ from .io.read import read
 from .io.write import write
 from .tasks import import_module
 
+if sys.version_info >= (3, 9):
+    from typing import Annotated
+else:
+    from typing_extensions import Annotated
+
 __all__ = ["__version__", "main", "sys"]
 
 
-def main(_file: str | None = None) -> None:
+def main(_file: Optional[str] = None) -> None:
     @dataclass
     class MykeArgs(yapx.types.Dataclass):
-        file: str = yapx.arg(
-            default=_file if _file else DEFAULT_MYKEFILE,
-            flags=["--myke-file"],
-            env="MYKE_FILE",
-            group="myke args",
-        )
-        file_paths: list[str] = yapx.arg(
-            default=lambda: [os.path.expanduser("~"), os.getcwd()],
-            flags=["--myke-file-paths"],
-            env="MYKE_FILE_PATHS",
-            group="myke args",
-        )
-        env_file: None | str = yapx.arg(
-            default=None,
-            flags=["--myke-env-file"],
-            env="MYKE_ENV_FILE",
-            group="myke args",
-        )
-        update_modules: bool = yapx.arg(
-            default=False,
-            flags=["--myke-update-modules"],
-            env="MYKE_UPDATE_MODULES",
-            group="myke args",
-        )
-        task_help: bool | None = yapx.arg(
-            default=None,
-            group="myke args",
-            exclusive=True,
-            flags=["-h", "--help"],
-        )
-        task_help_full: bool | None = yapx.arg(
-            default=None,
-            group="myke args",
-            exclusive=True,
-            flags=["--help-full"],
-        )
-        help: bool | None = yapx.arg(
-            default=None,
-            group="myke args",
-            exclusive=True,
-            flags=["--myke-help"],
-        )
-        explain: bool | None = yapx.arg(
-            default=None,
-            group="myke args",
-            exclusive=True,
-            flags=["--myke-explain"],
-        )
-        version: bool | None = yapx.arg(
-            default=None,
-            group="myke args",
-            exclusive=True,
-            flags=["--myke-version"],
-        )
-        create: bool | None = yapx.arg(
-            default=None,
-            group="myke args",
-            exclusive=True,
-            flags=["--myke-create"],
-        )
+        file: Annotated[
+            str,
+            yapx.arg(
+                default=_file if _file else DEFAULT_MYKEFILE,
+                flags=["--myke-file"],
+                env="MYKE_FILE",
+                group="myke args",
+            ),
+        ]
+        file_paths: Annotated[
+            List[str],
+            yapx.arg(
+                default=lambda: [os.path.expanduser("~"), os.getcwd()],
+                flags=["--myke-file-paths"],
+                env="MYKE_FILE_PATHS",
+                group="myke args",
+            ),
+        ]
+        env_file: Annotated[
+            Optional[str],
+            yapx.arg(
+                default=None,
+                flags=["--myke-env-file"],
+                env="MYKE_ENV_FILE",
+                group="myke args",
+            ),
+        ]
+        update_modules: Annotated[
+            bool,
+            yapx.arg(
+                default=False,
+                flags=["--myke-update-modules"],
+                env="MYKE_UPDATE_MODULES",
+                group="myke args",
+            ),
+        ]
+        task_help: Annotated[
+            Optional[bool],
+            yapx.arg(
+                default=None,
+                group="myke args",
+                exclusive=True,
+                flags=["-h", "--help"],
+            ),
+        ]
+        task_help_full: Annotated[
+            Optional[bool],
+            yapx.arg(
+                default=None,
+                group="myke args",
+                exclusive=True,
+                flags=["--help-full"],
+            ),
+        ]
+        help: Annotated[
+            Optional[bool],
+            yapx.arg(
+                default=None,
+                group="myke args",
+                exclusive=True,
+                flags=["--myke-help"],
+            ),
+        ]
+        explain: Annotated[
+            Optional[bool],
+            yapx.arg(
+                default=None,
+                group="myke args",
+                exclusive=True,
+                flags=["--myke-explain"],
+            ),
+        ]
+        version: Annotated[
+            Optional[bool],
+            yapx.arg(
+                default=None,
+                group="myke args",
+                exclusive=True,
+                flags=["--myke-version"],
+            ),
+        ]
+        create: Annotated[
+            Optional[bool],
+            yapx.arg(
+                default=None,
+                group="myke args",
+                exclusive=True,
+                flags=["--myke-create"],
+            ),
+        ]
 
     prog: str = _file if _file else MYKE_VAR_NAME
 
@@ -94,7 +127,7 @@ def main(_file: str | None = None) -> None:
     parser.add_arguments(MykeArgs)
 
     myke_args: MykeArgs
-    task_args: list[str]
+    task_args: List[str]
     myke_args, task_args = parser.parse_known_args_to_model(
         sys.argv[1:],
         args_model=MykeArgs,
@@ -123,7 +156,7 @@ def main(_file: str | None = None) -> None:
             raise NoTasksFoundError(_file)
         _file = os.path.abspath(_file)
 
-    mykefiles: list[str] = (
+    mykefiles: List[str] = (
         [myke_args.file]
         if os.path.dirname(myke_args.file)
         else [
@@ -154,10 +187,10 @@ def main(_file: str | None = None) -> None:
             )
             parser.exit()
 
-    root_task: Callable[..., Any] | None = TASKS.pop(ROOT_TASK_KEY, None)
+    root_task: Optional[Callable[..., Any]] = TASKS.pop(ROOT_TASK_KEY, None)
 
     if myke_args.explain:
-        explain_this: None | Callable[..., Any] = None
+        explain_this: Optional[Callable[..., Any]] = None
 
         if not task_args or task_args[0].startswith("-"):
             explain_this = root_task
