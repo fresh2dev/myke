@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier
-_commit: 5479a4f
+_commit: 261e42e
 _src_path: https://codeberg.org/Fresh2dev/copier-f2dv-project.git
 author_email: hello@Fresh2.dev
 author_name: Donald Mellenbruch
@@ -13,7 +13,7 @@ license_type: GPLv3
 package_name: myke
 project_description: null
 project_name: myke
-python_version: 3.7
+python_version: '3.7'
 repo_mirror: https://www.Fresh2.dev/code/r/myke
 repo_name: fresh2dev/myke
 repo_owner: fresh2dev
