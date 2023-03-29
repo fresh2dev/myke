@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import sys
 from typing import Callable
 
-if sys.version_info >= (3, 8):
-    from typing import Protocol
-else:
-    from typing_extensions import Protocol
+from yapx.types import Annotated  # pylint: disable=unused-import # noqa: F401
+from yapx.types import Literal  # pylint: disable=unused-import # noqa: F401
+from yapx.types import Protocol  # pylint: disable=unused-import # noqa: F401
+
+__all__ = ["Annotated", "Literal", "Protocol", "MykeType"]
 
 
 class MykeType(Protocol):
