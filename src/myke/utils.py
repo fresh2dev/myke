@@ -4,6 +4,8 @@ import os
 import re
 import stat
 from importlib.machinery import SourceFileLoader
+from pathlib import Path
+from subprocess import DEVNULL, CalledProcessError, CompletedProcess, run
 from typing import Any
 
 from yapx.utils import convert_to_command_string, parse_sequence
@@ -13,6 +15,7 @@ __all__ = [
     "parse_sequence",
     "make_executable",
     "is_version",
+    "get_repo_root",
 ]
 
 
@@ -69,6 +72,39 @@ def is_version(txt: str) -> bool:
         re.compile(f"^{VERSION_PATTERN}$", flags=re.VERBOSE | re.IGNORECASE).search(txt)
         is not None
     )
+
+
+def get_repo_root(path: str | Path | None = None) -> Path | None:
+    if path is None:
+        path = Path.cwd()
+    elif not isinstance(path, Path):
+        path = Path(path)
+
+    if path is None:
+        path = Path.cwd()
+    elif not isinstance(path, Path):
+        path = Path(path)
+
+    try:
+        run(
+            ["git", "status", "--porcelain"],
+            stdout=DEVNULL,
+            stderr=DEVNULL,
+            cwd=path,
+            check=True,
+        )
+    except CalledProcessError:
+        return None
+
+    p: CompletedProcess = run(
+        ["git", "rev-parse", "--show-toplevel"],
+        cwd=path,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    return Path(p.stdout.strip())
 
 
 class _MykeSourceFileLoader(SourceFileLoader):
