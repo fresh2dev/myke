@@ -5,6 +5,7 @@ import re
 import stat
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
+from shutil import which
 from subprocess import DEVNULL, CalledProcessError, CompletedProcess, run
 from typing import Any
 
@@ -75,6 +76,9 @@ def is_version(txt: str) -> bool:
 
 
 def get_repo_root(path: str | Path | None = None) -> Path | None:
+    if not which("git"):
+        return None
+
     if path is None:
         path = Path.cwd()
     elif not isinstance(path, Path):

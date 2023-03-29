@@ -3,6 +3,7 @@ import sys
 from dataclasses import dataclass
 from fnmatch import fnmatch
 from inspect import getsource
+from pathlib import Path
 from typing import Any, Callable, List, Optional
 
 import yapx
@@ -14,11 +15,8 @@ from .io.echo import echo
 from .io.read import read
 from .io.write import write
 from .tasks import import_module
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated
-else:
-    from typing_extensions import Annotated
+from .types import Annotated
+from .utils import get_repo_root
 
 __all__ = ["__version__", "main", "sys"]
 
@@ -149,6 +147,10 @@ def main(_file: Optional[str] = None) -> None:
     if myke_args.update_modules:
         os.environ["MYKE_UPDATE_MODULES"] = "1"
 
+    repo_root: Optional[Path] = get_repo_root()
+    if repo_root:
+        os.chdir(repo_root)
+
     if _file:
         if not os.path.exists(_file):
             raise FileNotFoundError(_file)
@@ -226,6 +228,6 @@ def main(_file: Optional[str] = None) -> None:
         root_task,
         _args=task_args,
         _prog=prog,
-        _print_help=myke_args.task_help_full,
+        _print_help=bool(myke_args.task_help_full),
         **TASKS,
     )
