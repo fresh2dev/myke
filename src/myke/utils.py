@@ -9,11 +9,10 @@ from shutil import which
 from subprocess import DEVNULL, CalledProcessError, CompletedProcess, run
 from typing import Any
 
-from yapx.utils import convert_to_command_string, parse_sequence
+from yapx.utils import convert_to_command_string
 
 __all__ = [
     "convert_to_command_string",
-    "parse_sequence",
     "make_executable",
     "is_version",
     "get_repo_root",
