@@ -2,7 +2,7 @@ from functools import lru_cache as cache
 
 from yapx import arg
 
-from . import exceptions, utils
+from . import exceptions, types, utils
 from .__version__ import __version__
 from .globals import TASKS
 from .io.echo import echo
@@ -43,4 +43,5 @@ __all__ = [
     "exceptions",
     "cache",
     "echo",
+    "types",
 ]
