@@ -9,7 +9,15 @@ from .io.echo import echo
 from .io.read import read
 from .io.write import write
 from .main import main
-from .run import require, run, sh, sh_stdout, sh_stdout_lines
+from .run import (
+    require,
+    run,
+    run_stdout,
+    run_stdout_lines,
+    sh,
+    sh_stdout,
+    sh_stdout_lines,
+)
 from .tasks import add_tasks, import_module, install_module, task, task_run, task_sh
 
 __all__ = [
@@ -22,6 +30,8 @@ __all__ = [
     "import_module",
     "install_module",
     "run",
+    "run_stdout",
+    "run_stdout_lines",
     "sh",
     "sh_stdout",
     "sh_stdout_lines",

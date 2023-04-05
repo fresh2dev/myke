@@ -9,7 +9,15 @@ from typing import Any, Sequence
 
 from .utils import split_and_trim_text
 
-__all__ = ["run", "sh", "sh_stdout", "sh_stdout_lines", "require"]
+__all__ = [
+    "run",
+    "run_stdout",
+    "run_stdout_lines",
+    "sh",
+    "sh_stdout",
+    "sh_stdout_lines",
+    "require",
+]
 
 
 def run(
