@@ -7,7 +7,6 @@ import sys
 from functools import wraps
 from typing import Any, Sequence
 
-from .exceptions import CalledProcessError
 from .utils import split_and_trim_text
 
 __all__ = ["run", "sh", "sh_stdout", "sh_stdout_lines", "require"]
@@ -18,13 +17,11 @@ def run(
     capture_output: None | bool = False,
     echo: bool | None = True,
     check: bool | None = True,
-    cwd: str | None = None,
     env: dict[str, str] | None = None,
     env_update: dict[str, str | None] | None = None,
-    timeout: float | None = None,
     shell: bool | None = None,
     **kwargs: Any,
-) -> tuple[str | None, str | None, int]:
+) -> subprocess.CompletedProcess[bytes | str]:
     if shell is None:
         shell = isinstance(args, str) and " " in args
 
@@ -45,42 +42,50 @@ def run(
         args,
         shell=shell,
         env=env,
-        cwd=cwd,
-        timeout=timeout,
         capture_output=bool(capture_output),
-        text=capture_output,
         check=False,
         **kwargs,
     )
 
-    if echo and capture_output:
-        for out in (p.stdout, p.stderr):
-            if out:
-                print(out.rstrip(os.linesep))
+    try:
+        if check:
+            p.check_returncode()
+    finally:
+        if echo and capture_output:
+            for x in (p.stdout, p.stderr):
+                if x and isinstance(x, str):
+                    print(x.rstrip(os.linesep))
 
-    if check and p.returncode:
-        raise CalledProcessError(p.returncode, p.args, p.stdout, p.stderr)
-
-    return p.stdout, p.stderr, p.returncode
+    return p
 
 
 @wraps(run)
-def sh(*args: Any, **kwargs: Any) -> tuple[str | None, str | None, int]:
-    kwargs["shell"] = True
-    return run(*args, **kwargs)
+def run_stdout_lines(*args: Any, **kwargs: Any) -> list[str]:
+    kwargs["capture_output"] = True
+    kwargs["text"] = True
+    kwargs["echo"] = kwargs.get("echo", False)
+    p: subprocess.CompletedProcess[str] = run(*args, **kwargs)
+    return split_and_trim_text(p.stdout)
+
+
+@wraps(run)
+def run_stdout(*args: Any, **kwargs: Any) -> str:
+    return os.linesep.join(run_stdout_lines(*args, **kwargs))
+
+
+@wraps(run)
+def sh(*args: Any, **kwargs: Any) -> subprocess.CompletedProcess[bytes | str]:
+    return run(*args, shell=True, **kwargs)
 
 
 @wraps(sh)
 def sh_stdout_lines(*args: Any, **kwargs: Any) -> list[str]:
-    kwargs["capture_output"] = True
-    kwargs["echo"] = kwargs.get("echo", False)
-    stdout, *_ = sh(*args, **kwargs)
-    return split_and_trim_text(stdout)
+    return run_stdout_lines(*args, shell=True, **kwargs)
 
 
 @wraps(sh)
 def sh_stdout(*args: Any, **kwargs: Any) -> str:
-    return os.linesep.join(sh_stdout_lines(*args, **kwargs))
+    return run_stdout(*args, shell=True, **kwargs)
 
 
 def _run_pip(
@@ -89,7 +94,7 @@ def _run_pip(
     echo: bool = False,
     capture_output: bool = False,
     **kwargs: str,
-) -> tuple[str | None, str | None, int]:
+) -> subprocess.CompletedProcess[str]:
     if not pip_args:
         pip_args = []
 
@@ -105,6 +110,7 @@ def _run_pip(
         ],
         echo=echo,
         capture_output=capture_output,
+        text=True,
     )
 
 
@@ -113,7 +119,7 @@ def require(
     pip_args: list[str] | None = None,
     skip_check: bool = False,
     **kwargs: str,
-) -> tuple[str | None, str | None, int]:
+) -> subprocess.CompletedProcess[str]:
     if not pip_args:
         pip_args = []
 
@@ -121,7 +127,7 @@ def require(
         [] if skip_check else ["-qq", "--dry-run", "--report", "-"]
     )
 
-    stdout, stderr, returncode = _run_pip(
+    p: subprocess.CompletedProcess[str] = _run_pip(
         *args,
         pip_args=pip_args + dry_run_args,
         echo=False,
@@ -130,11 +136,11 @@ def require(
     )
 
     if dry_run_args:
-        if not stdout or returncode != 0:
-            print(stdout, stderr, returncode)
-            return stdout, stderr, returncode
+        if not p.stdout or p.returncode != 0:
+            print(p.stdout, p.stderr, p.returncode)
+            return p
 
-        result: dict[str, Any] = json.loads(stdout)
+        result: dict[str, Any] = json.loads(p.stdout)
 
         if result and result.get("install"):
             return _run_pip(
@@ -145,4 +151,4 @@ def require(
                 **kwargs,
             )
 
-    return stdout, stderr, returncode
+    return p

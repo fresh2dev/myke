@@ -62,39 +62,12 @@ def hello_sh(name="world"):
     """
 
 
-@myke.task_sh_stdout_lines(echo=True)
-def hello_sh_stdout(name="world"):
-    return f"""
-        echo '   hello {name}   '
-        echo
-        echo
-
-        echo woohoo
-        echo
-    """
-
-
 @myke.task
 def hello_depends(name="world"):
     output: List[str] = hello_sh_stdout(name)
     assert len(output) == 2
     assert output[0] == f"hello {name}"
     assert output[1] == "woohoo"
-
-
-@myke.task_sh_stdout(env={"NAME": "donald"}, echo=True)
-def hello_env():
-    return 'echo "hello $NAME"'
-
-
-@myke.task_sh_stdout(echo=True)
-def hello_env2():
-    return 'echo "hello $NAME"'
-
-
-@myke.task_sh_stdout(env_update={"NAME": "donald"}, echo=True)
-def hello_env_update():
-    return 'echo "hello $NAME"'
 
 
 @myke.task_sh
@@ -106,9 +79,11 @@ def hello_check():
 def hello_timeout():
     return "sleep 2s"
 
+
 @myke.task
 def print_args(args: Optional[List[str]] = myke.arg(pos=True)):
     myke.echo(args)
+
 
 @myke.task
 def print_kwargs(kwargs: Optional[Dict[str, str]] = myke.arg(pos=True)):

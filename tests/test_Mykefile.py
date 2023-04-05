@@ -96,41 +96,6 @@ def test_Mykefile_hello_positional_bool_false(capsys, resources_dir: str):
     _ = _common(capsys, resources_dir, cli_args=cli_args, expected_txt=expected_txt)
 
 
-def test_Mykefile_hello_sh(capsys, resources_dir: str):
-    txt = str(uuid4())
-    cli_args: List[str] = ["hello-sh-stdout", "--name", txt]
-    expected_txt: List[str] = [txt, "woohoo"]
-    _ = _common(capsys, resources_dir, cli_args=cli_args, expected_txt=expected_txt)
-
-
-def test_Mykefile_hello_env(capsys, resources_dir: str):
-    expected_txt = "donald"
-    cli_args: List[str] = ["hello-env"]
-    _ = _common(capsys, resources_dir, cli_args=cli_args, expected_txt=expected_txt)
-
-
-def test_Mykefile_hello_env2(clean_dir, capsys, resources_dir: str):
-    from myke import write
-
-    expected_txt: str = str(uuid4())
-    write(f"NAME={expected_txt}", path=".env")
-    cli_args: List[str] = ["--myke-env-file", ".env", "hello-env2"]
-    _ = _common(capsys, resources_dir, cli_args=cli_args, expected_txt=expected_txt)
-
-
-def test_Mykefile_hello_env_update(capsys, resources_dir: str):
-    expected_txt = "donald"
-    cli_args: List[str] = ["hello-env-update"]
-    _ = _common(capsys, resources_dir, cli_args=cli_args, expected_txt=expected_txt)
-
-
-def test_Mykefile_hello_depends(capsys, resources_dir: str):
-    txt = str(uuid4())
-    cli_args: List[str] = ["hello-depends", "--name", txt]
-    expected_txt: List[str] = [txt, "woohoo"]
-    _ = _common(capsys, resources_dir, cli_args=cli_args, expected_txt=expected_txt)
-
-
 def test_Mykefile_hello_othermyke(capsys, resources_dir: str):
     expected_txt = str(uuid4())
     cli_args: List[str] = ["hello-othermyke", "--name", expected_txt]

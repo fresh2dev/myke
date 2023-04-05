@@ -3,6 +3,7 @@ from __future__ import annotations
 import collections.abc
 import os
 from functools import partial, wraps
+from subprocess import CompletedProcess
 from types import ModuleType
 from typing import Any, Callable, Sequence
 
@@ -10,13 +11,8 @@ from .exceptions import MykeNotFoundError, NoTasksFoundError, TaskAlreadyRegiste
 from .globals import MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS
 from .io.read import read
 from .io.write import write
-from .sh import sh
-from .utils import (
-    _MykeSourceFileLoader,
-    convert_to_command_string,
-    make_executable,
-    split_and_trim_text,
-)
+from .run import run, sh
+from .utils import _MykeSourceFileLoader, convert_to_command_string, make_executable
 
 
 def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
@@ -114,7 +110,7 @@ def task(
     return func
 
 
-def task_sh(
+def task_run(
     func: Callable[..., str | Sequence[str]] | None = None,
     *,
     name: str | None = None,
@@ -128,8 +124,8 @@ def task_sh(
     timeout: float | None = None,
     executable: str | None = None,
 ) -> (
-    Callable[..., tuple[str | None, str | None, int]]
-    | Callable[..., Callable[..., tuple[str | None, str | None, int]]]
+    Callable[..., CompletedProcess[bytes | str]]
+    | Callable[..., Callable[..., CompletedProcess[bytes | str]]]
 ):
     if not func:
         return partial(
@@ -160,7 +156,7 @@ def task_sh(
                 "Expected a string or list of strings to be returned for `sh` function",
             )
 
-        return sh(
+        return run(
             func_script,
             capture_output=capture_output,
             echo=echo,
@@ -178,25 +174,29 @@ def task_sh(
     return task(_inner_func, name=name, root=root)
 
 
-def _task_sh_stdout_lines(
+def task_sh(
     func: Callable[..., str | Sequence[str]] | None = None,
     *,
     name: str | None = None,
     root: bool | None = False,
-    echo: bool | None = False,
+    capture_output: bool | None = False,
+    echo: bool | None = True,
     check: bool | None = True,
     cwd: str | None = None,
     env: dict[str, str] | None = None,
     env_update: dict[str, str | None] | None = None,
     timeout: float | None = None,
     executable: str | None = None,
-    join_lines: bool | None = False,
-) -> Callable[..., str | list[str]] | Callable[..., Callable[..., str | list[str]]]:
+) -> (
+    Callable[..., CompletedProcess[bytes | str]]
+    | Callable[..., Callable[..., CompletedProcess[bytes | str]]]
+):
     if not func:
         return partial(
-            task_sh_stdout_lines,
+            task_sh,
             name=name,
             root=root,
+            capture_output=capture_output,
             echo=echo,
             check=check,
             cwd=cwd,
@@ -207,11 +207,22 @@ def _task_sh_stdout_lines(
         )
 
     @wraps(func)
-    def _inner_func(*args: Any, **kwargs: Any) -> str | list[str]:
+    def _inner_func(*args: Any, **kwargs: Any) -> tuple[str | None, str | None, int]:
         assert func
-        stdout, *_ = sh(
-            func(*args, **kwargs),
-            capture_output=True,
+
+        func_script: str = func(*args, **kwargs)
+
+        if not isinstance(func_script, str) and not isinstance(
+            func_script,
+            collections.abc.Sequence,
+        ):
+            raise TypeError(
+                "Expected a string to be returned for `sh` function",
+            )
+
+        return sh(
+            func_script,
+            capture_output=capture_output,
             echo=echo,
             check=check,
             cwd=cwd,
@@ -221,28 +232,7 @@ def _task_sh_stdout_lines(
             executable=executable,
         )
 
-        stdout_split: list[str] = split_and_trim_text(stdout)
-
-        return os.linesep.join(stdout_split) if join_lines else stdout_split
-
     if not name:
         name = func.__name__
 
     return task(_inner_func, name=name, root=root)
-
-
-@wraps(_task_sh_stdout_lines)
-def task_sh_stdout_lines(
-    *args: Any,
-    **kwargs: Any,
-) -> Callable[..., list[str]] | Callable[..., Callable[..., list[str]]]:
-    return _task_sh_stdout_lines(*args, **kwargs)  # type: ignore
-
-
-@wraps(_task_sh_stdout_lines)
-def task_sh_stdout(
-    *args: Any,
-    **kwargs: Any,
-) -> Callable[..., str] | Callable[..., Callable[..., str]]:
-    kwargs["join_lines"] = True
-    return _task_sh_stdout_lines(*args, **kwargs)  # type: ignore
