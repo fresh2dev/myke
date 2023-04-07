@@ -68,17 +68,17 @@ def run(
 
 
 @wraps(run)
-def run_stdout_lines(*args: Any, **kwargs: Any) -> list[str]:
+def run_stdout(*args: Any, **kwargs: Any) -> str:
     kwargs["capture_output"] = True
     kwargs["text"] = True
     kwargs["echo"] = kwargs.get("echo", False)
     p: subprocess.CompletedProcess[str] = run(*args, **kwargs)
-    return split_and_trim_text(p.stdout)
+    return p.stdout.strip()
 
 
 @wraps(run)
-def run_stdout(*args: Any, **kwargs: Any) -> str:
-    return os.linesep.join(run_stdout_lines(*args, **kwargs))
+def run_stdout_lines(*args: Any, **kwargs: Any) -> list[str]:
+    return split_and_trim_text(run_stdout(*args, **kwargs))
 
 
 @wraps(run)
@@ -87,13 +87,13 @@ def sh(*args: Any, **kwargs: Any) -> subprocess.CompletedProcess[bytes | str]:
 
 
 @wraps(sh)
-def sh_stdout_lines(*args: Any, **kwargs: Any) -> list[str]:
-    return run_stdout_lines(*args, shell=True, **kwargs)
+def sh_stdout(*args: Any, **kwargs: Any) -> str:
+    return run_stdout(*args, shell=True, **kwargs)
 
 
 @wraps(sh)
-def sh_stdout(*args: Any, **kwargs: Any) -> str:
-    return run_stdout(*args, shell=True, **kwargs)
+def sh_stdout_lines(*args: Any, **kwargs: Any) -> list[str]:
+    return run_stdout_lines(*args, shell=True, **kwargs)
 
 
 def _run_pip(
