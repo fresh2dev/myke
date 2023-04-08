@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import re
 import stat
+from contextlib import suppress
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
 from shutil import which
@@ -76,17 +77,21 @@ def is_version(txt: str) -> bool:
 
 def get_repo_root(path: str | Path | None = None) -> Path | None:
     if not which("git"):
-        return None
+        return FileNotFoundError("git")
 
     if path is None:
         path = Path.cwd()
-    elif not isinstance(path, Path):
-        path = Path(path)
+    else:
+        if not isinstance(path, Path):
+            path = Path(path)
 
-    if path is None:
-        path = Path.cwd()
-    elif not isinstance(path, Path):
-        path = Path(path)
+        path = path.absolute()
+
+        if path.is_file():
+            path = path.parent
+
+        with suppress(ValueError):
+            path = list(reversed(path.parents))[path.parts.index(".git") - 1]
 
     try:
         run(
@@ -107,7 +112,7 @@ def get_repo_root(path: str | Path | None = None) -> Path | None:
         text=True,
     )
 
-    return Path(p.stdout.strip())
+    return Path(p.stdout.rstrip())
 
 
 class _MykeSourceFileLoader(SourceFileLoader):
