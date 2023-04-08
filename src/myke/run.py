@@ -61,7 +61,9 @@ def run(
     finally:
         if echo and capture_output:
             for x in (p.stdout, p.stderr):
-                if x and isinstance(x, str):
+                if x:
+                    if isinstance(x, bytes):
+                        x = x.decode()
                     print(x.rstrip(os.linesep))
 
     return p
