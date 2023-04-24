@@ -9,7 +9,7 @@ import myke
 from myke.main import sys as target_sys
 
 
-def test_main_version(capsys: CaptureFixture, version_regex: Pattern):
+def test_main_version(capsys: CaptureFixture, version_pattern: Pattern):
     # 1. ARRANGE
     args: List[str] = ["--myke-version"]
 
@@ -23,7 +23,7 @@ def test_main_version(capsys: CaptureFixture, version_regex: Pattern):
     captured: CaptureResult = capsys.readouterr()
     assert not captured.err
     assert captured.out
-    assert version_regex.search(captured.out), "invalid version"
+    assert version_pattern.search(captured.out), "invalid version"
     assert pexit.value.code == 0
 
 

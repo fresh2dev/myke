@@ -28,7 +28,7 @@ data:
         "name": "py-test",
         "image": "registry.lokalhost.net/fresh2dev/myke:503df81",
         "commands": [
-          "myke py-requirements",
+          "myke py-install",
           "myke py-reports",
           "myke py-build"
         ],
@@ -47,7 +47,7 @@ data:
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
-          "myke py-set-version --repository lokalhost",
+          "myke py-version-set --repository lokalhost",
           "myke py-build"
         ],
         "when": {}
