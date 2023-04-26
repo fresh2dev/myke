@@ -75,10 +75,10 @@ class read(str):
     @classmethod
     @wraps(text)
     def toml(cls, *args: str, **kwargs: str) -> Dict[str, Any]:
-        try:
-            import tomli as _toml
-        except ImportError:
+        if sys.version_info >= (3, 11):
             import tomllib as _toml
+        else:
+            import tomli as _toml
 
         return cls._read_simple_dict(partial(_toml.loads, cls.text(*args, **kwargs)))
 

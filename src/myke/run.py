@@ -133,6 +133,10 @@ def require(
     if not pip_args:
         pip_args = []
 
+    for x in ["--disable-pip-version-check"]:
+        if x not in pip_args:
+            pip_args.append(x)
+
     dry_run_args: list[str] = (
         [] if skip_check else ["-qq", "--dry-run", "--report", "-"]
     )
