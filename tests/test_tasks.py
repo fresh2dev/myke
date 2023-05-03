@@ -3,6 +3,7 @@ import os
 import pytest
 
 
+@pytest.mark.skip(reason="remote repo does not exist right now.")
 def test_import_module(clean_dir):
     import myke
 
@@ -33,6 +34,7 @@ def test_import_module(clean_dir):
     assert os.path.exists(expected_file)
 
 
+@pytest.mark.skip(reason="remote repo does not exist right now.")
 def test_install_module_notfound(clean_dir):
     import myke
 
