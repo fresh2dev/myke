@@ -26,7 +26,7 @@ data:
     [
       {
         "name": "py-test",
-        "image": "registry.lokalhost.net/fresh2dev/myke:503df81",
+        "image": "registry.lokalhost.net/fresh2dev/mykefiles:18d1747",
         "environment": {
           "PIP_CONF": {"from_secret": "PIP_CONF"}
         },
@@ -45,7 +45,7 @@ data:
     [
       {
         "name": "py-build-package",
-        "image": "registry.lokalhost.net/fresh2dev/myke:503df81",
+        "image": "registry.lokalhost.net/fresh2dev/mykefiles:18d1747",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
           "PIP_CONF": {"from_secret": "PIP_CONF"}
@@ -60,7 +60,7 @@ data:
       },
       {
         "name": "py-publish-sandbox",
-        "image": "registry.lokalhost.net/fresh2dev/myke:503df81",
+        "image": "registry.lokalhost.net/fresh2dev/mykefiles:18d1747",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
           "PIP_CONF": {"from_secret": "PIP_CONF"},
@@ -75,7 +75,7 @@ data:
       },
       {
         "name": "py-publish-dev",
-        "image": "registry.lokalhost.net/fresh2dev/myke:503df81",
+        "image": "registry.lokalhost.net/fresh2dev/mykefiles:18d1747",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
           "PIP_CONF": {"from_secret": "PIP_CONF"},
@@ -92,7 +92,7 @@ data:
       },
       {
         "name": "py-publish-test",
-        "image": "registry.lokalhost.net/fresh2dev/myke:503df81",
+        "image": "registry.lokalhost.net/fresh2dev/mykefiles:18d1747",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
           "PIP_CONF": {"from_secret": "PIP_CONF"},
@@ -109,7 +109,7 @@ data:
       },
       {
         "name": "py-publish-prod",
-        "image": "registry.lokalhost.net/fresh2dev/myke:503df81",
+        "image": "registry.lokalhost.net/fresh2dev/mykefiles:18d1747",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
           "PIP_CONF": {"from_secret": "PIP_CONF"},
