@@ -99,9 +99,8 @@ testpaths = ["tests"]
 source = ["src"]
 
 [tool.pylint.MASTER]
-# init-hook='import sys; sys.path.append("src"); sys.path.append("tests");'
-load-plugins = ["pylint_pytest"]
 ignore-paths = "^(?!src|tests).*$"
+load-plugins = ["pylint_pytest"]
 [tool.pylint.messages_control]
 max-line-length = 88
 disable = [
