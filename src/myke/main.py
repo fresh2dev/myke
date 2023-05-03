@@ -1,5 +1,6 @@
 import os
 import sys
+from contextlib import suppress
 from dataclasses import dataclass
 from fnmatch import fnmatch
 from inspect import getsource
@@ -147,9 +148,10 @@ def main(_file: Optional[str] = None) -> None:
     if myke_args.update_modules:
         os.environ["MYKE_UPDATE_MODULES"] = "1"
 
-    repo_root: Optional[Path] = get_repo_root()
-    if repo_root:
-        os.chdir(repo_root)
+    with suppress(FileNotFoundError):
+        repo_root: Optional[Path] = get_repo_root()
+        if repo_root:
+            os.chdir(repo_root)
 
     if _file:
         if not os.path.exists(_file):

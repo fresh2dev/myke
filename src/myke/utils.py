@@ -77,7 +77,7 @@ def is_version(txt: str) -> bool:
 
 def get_repo_root(path: str | Path | None = None) -> Path | None:
     if not which("git"):
-        return FileNotFoundError("git")
+        raise FileNotFoundError("git")
 
     if path is None:
         path = Path.cwd()
