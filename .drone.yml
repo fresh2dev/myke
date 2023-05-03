@@ -27,7 +27,11 @@ data:
       {
         "name": "py-test",
         "image": "registry.lokalhost.net/fresh2dev/myke:503df81",
+        "environment": {
+          "PIP_CONF": {"from_secret": "PIP_CONF"}
+        },
         "commands": [
+          "mkdir -p ~/.config/pip && echo \"$PIP_CONF\" > ~/.config/pip/pip.conf",
           "myke py-install",
           "myke py-reports",
           "myke py-build"
@@ -43,10 +47,12 @@ data:
         "name": "py-build-package",
         "image": "registry.lokalhost.net/fresh2dev/myke:503df81",
         "environment": {
-          "PYPI_CREDS": {"from_secret": "PYPI_CREDS"}
+          "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
+          "PIP_CONF": {"from_secret": "PIP_CONF"}
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
+          "mkdir -p ~/.config/pip && echo \"$PIP_CONF\" > ~/.config/pip/pip.conf",
           "myke py-version-set --repository lokalhost",
           "myke py-build"
         ],
@@ -57,10 +63,12 @@ data:
         "image": "registry.lokalhost.net/fresh2dev/myke:503df81",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
+          "PIP_CONF": {"from_secret": "PIP_CONF"},
           "TWINE_CERT": "/etc/ssl/certs/ca-certificates.crt"
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
+          "mkdir -p ~/.config/pip && echo \"$PIP_CONF\" > ~/.config/pip/pip.conf",
           "myke py-publish --repository lokalhost"
         ],
         "when": {}
@@ -70,10 +78,12 @@ data:
         "image": "registry.lokalhost.net/fresh2dev/myke:503df81",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
+          "PIP_CONF": {"from_secret": "PIP_CONF"},
           "TWINE_CERT": "/etc/ssl/certs/ca-certificates.crt"
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
+          "mkdir -p ~/.config/pip && echo \"$PIP_CONF\" > ~/.config/pip/pip.conf",
           "myke py-publish --repository codeberg"
         ],
         "when": {
@@ -85,10 +95,12 @@ data:
         "image": "registry.lokalhost.net/fresh2dev/myke:503df81",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
+          "PIP_CONF": {"from_secret": "PIP_CONF"},
           "TWINE_CERT": "/etc/ssl/certs/ca-certificates.crt"
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
+          "mkdir -p ~/.config/pip && echo \"$PIP_CONF\" > ~/.config/pip/pip.conf",
           "myke py-publish --repository testpypi"
         ],
         "when": {
@@ -100,10 +112,12 @@ data:
         "image": "registry.lokalhost.net/fresh2dev/myke:503df81",
         "environment": {
           "PYPI_CREDS": {"from_secret": "PYPI_CREDS"},
+          "PIP_CONF": {"from_secret": "PIP_CONF"},
           "TWINE_CERT": "/etc/ssl/certs/ca-certificates.crt"
         },
         "commands": [
           "echo \"$PYPI_CREDS\" > ~/.pypirc",
+          "mkdir -p ~/.config/pip && echo \"$PIP_CONF\" > ~/.config/pip/pip.conf",
           "myke py-publish --repository pypi"
         ],
         "when": {
@@ -119,6 +133,14 @@ data:
         "get": {
           "path": "secret/data/hostbutter/global",
           "name": "PYPI_CREDS"
+        }
+      },
+      {
+        "kind": "secret",
+        "name": "PIP_CONF",
+        "get": {
+          "path": "secret/data/hostbutter/global",
+          "name": "PIP_CONF"
         }
       }
     ]
