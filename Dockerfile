@@ -13,7 +13,7 @@ COPY ./dist /dist
 RUN find /dist -name "*.whl" -exec \
     pip install --no-cache-dir \
         --extra-index-url "https://codeberg.org/api/packages/Fresh2dev/pypi/simple" \
-        "{}[extras,build,docs,dev,tests]" \; \
+        "{}[extras]" \; \
     && pip show "myke"
 
 FROM ${HB_IMAGE_REGISTRY}/python:3.10.10-slim-bullseye
