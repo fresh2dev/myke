@@ -101,6 +101,7 @@ source = ["src"]
 [tool.pylint.MASTER]
 ignore-paths = "^(?!src|tests).*$"
 load-plugins = ["pylint_pytest"]
+extension-pkg-whitelist = ["pydantic"]
 [tool.pylint.messages_control]
 max-line-length = 88
 disable = [
