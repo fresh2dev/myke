@@ -56,7 +56,7 @@ def test_main_explain(capsys: CaptureFixture, resources_dir: str):
 '''
 
     # 2. ACT
-    myke.import_module(mykefile)
+    myke.import_mykefile(mykefile)
 
     with mock.patch.object(target_sys, "argv", [""] + args), pytest.raises(
         SystemExit,

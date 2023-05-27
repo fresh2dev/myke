@@ -9,10 +9,8 @@ from typing import Any, Callable, Sequence
 
 from .exceptions import MykeNotFoundError, NoTasksFoundError, TaskAlreadyRegisteredError
 from .globals import MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS
-from .io.read import read
-from .io.write import write
 from .run import run, sh
-from .utils import _MykeSourceFileLoader, convert_to_command_string, make_executable
+from .utils import _MykeSourceFileLoader, convert_to_command_string
 
 
 def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
@@ -35,59 +33,27 @@ def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
         TASKS[k] = v
 
 
-def import_module(*mykefiles: str, overwrite: bool | None = None) -> None:
+def import_mykefile(path: str) -> None:
     n_tasks_before: int = len(TASKS)
-    for m in mykefiles:
-        if m.startswith("https://"):
-            m = install_module(m, overwrite=overwrite)
 
-        loader = _MykeSourceFileLoader(os.path.relpath(m), m)
-        mod: ModuleType = ModuleType(loader.name)
-        loader.exec_module(mod)
+    loader = _MykeSourceFileLoader(os.path.relpath(path), path)
+    mod: ModuleType = ModuleType(loader.name)
+    loader.exec_module(mod)
 
-        if not hasattr(mod, MYKE_VAR_NAME):
-            raise MykeNotFoundError(m)
+    if not hasattr(mod, MYKE_VAR_NAME):
+        raise MykeNotFoundError(path)
 
-        n_tasks_after: int = len(TASKS)
-        if n_tasks_after <= n_tasks_before:
-            raise NoTasksFoundError(m)
-        n_tasks_before = n_tasks_after
+    if len(TASKS) <= n_tasks_before:
+        raise NoTasksFoundError(path)
 
 
-def install_module(
-    url: str,
-    path: str | None = None,
-    fail_if_exists: bool | None = None,
-    overwrite: bool | None = None,
-) -> str:
-    if overwrite is None:
-        overwrite = bool(os.getenv("MYKE_UPDATE_MODULES"))
+def import_module(name: str) -> None:
+    n_tasks_before: int = len(TASKS)
 
-    if not url.startswith("https://"):
-        raise ValueError("Download URLs must start with 'https://'")
+    __import__(name)
 
-    if path is None:
-        path = "tasks"
-
-        if not os.path.exists(path):
-            os.mkdir(path)
-
-        path = os.path.join(path, os.path.basename(url))
-
-    if not overwrite and not fail_if_exists and os.path.exists(path):
-        return path
-
-    resp_text: str = read.url(url)
-
-    import_myke: str = f"import {MYKE_VAR_NAME}"
-    if import_myke not in resp_text:
-        raise MykeNotFoundError(f'"{import_myke}" not found response text of {url}')
-
-    write(resp_text, path=path, overwrite=overwrite)
-
-    make_executable(path)
-
-    return path
+    if len(TASKS) <= n_tasks_before:
+        raise NoTasksFoundError(name)
 
 
 def task(

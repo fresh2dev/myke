@@ -18,7 +18,7 @@ from .run import (
     sh_stdout,
     sh_stdout_lines,
 )
-from .tasks import add_tasks, import_module, install_module, task, task_run, task_sh
+from .tasks import add_tasks, import_module, import_mykefile, task, task_run, task_sh
 
 __all__ = [
     "__version__",
@@ -27,8 +27,8 @@ __all__ = [
     "task_run",
     "task_sh",
     "add_tasks",
+    "import_mykefile",
     "import_module",
-    "install_module",
     "run",
     "run_stdout",
     "run_stdout_lines",

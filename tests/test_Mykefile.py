@@ -24,7 +24,7 @@ def _common(
     mykefile: str = os.path.join(resources_dir, "Mykefile")
 
     # 2. ACT
-    myke.import_module(mykefile)
+    myke.import_mykefile(mykefile)
 
     with mock.patch.object(target_sys, "argv", [""] + cli_args):
         myke.main(mykefile)
