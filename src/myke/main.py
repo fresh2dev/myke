@@ -78,6 +78,15 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
                 flags=["--myke-explain"],
             ),
         ]
+        create: Annotated[
+            Optional[bool],
+            yapx.arg(
+                default=None,
+                group="myke args",
+                exclusive=True,
+                flags=["--myke-create"],
+            ),
+        ]
         version: Annotated[
             Optional[bool],
             yapx.arg(
@@ -87,13 +96,13 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
                 flags=["--myke-version"],
             ),
         ]
-        create: Annotated[
+        show_tui: Annotated[
             Optional[bool],
             yapx.arg(
                 default=None,
                 group="myke args",
                 exclusive=True,
-                flags=["--myke-create"],
+                flags=["--tui", "--myke-tui"],
             ),
         ]
 
@@ -179,7 +188,11 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
 
         parser.exit()
 
-    if myke_args.help or (not task_args and not myke_args.task_help_full):
+    if not task_args and not myke_args.help and not myke_args.show_tui:
+        myke_args.show_tui = yapx.utils.is_tui_available()
+        myke_args.help = not myke_args.show_tui
+
+    if myke_args.help:
         parser.print_help()
         echo.tasks(prog=prog)
         parser.exit()
@@ -195,10 +208,15 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
     if myke_args.task_help:
         task_args.append("--help")
 
+    tui_flags: Optional[List[str]] = ["--tui"] if myke_args.show_tui else None
+    if tui_flags:
+        task_args.extend(tui_flags)
+
     yapx.run(
         root_task,
         _args=task_args,
         _prog=prog,
         _print_help=bool(myke_args.task_help_full),
+        _tui_flags=tui_flags,
         **TASKS,
     )
