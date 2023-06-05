@@ -5,9 +5,9 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "myke"
 authors = [
-    {name = "Donald Mellenbruch", email = "hello@Fresh2.dev"},
+    {name = "Donald Mellenbruch", email = "hello@f2dv.com"},
 ]
-description = "None"
+description = "A dynamic Python task runner."
 readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.7"
@@ -76,9 +76,9 @@ extras = [
 ]
 
 [project.urls]
-Homepage = "https://www.Fresh2.dev/code/r/myke/i"
+Homepage = "https://www.f2dv.com/code/r/myke/i"
 Repository = "https://www.github.com/fresh2dev/myke"
-Funding = "https://www.Fresh2.dev/funding"
+Funding = "https://www.f2dv.com/funding"
 
 [project.scripts]
 myke = "myke.__main__:main"
@@ -97,9 +97,6 @@ version = {attr = "myke.__version__.__version__"}
 [tool.pytest.ini_options]
 minversion = 7.0
 testpaths = ["tests"]
-
-[tool.coverage.run]
-source = ["src"]
 
 [tool.pylint.MASTER]
 ignore-paths = "^(?!src|tests).*$"
