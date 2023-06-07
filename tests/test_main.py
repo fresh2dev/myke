@@ -52,7 +52,7 @@ def test_main_explain(capsys: CaptureFixture, resources_dir: str):
     mykefile: str = os.path.join(resources_dir, "Mykefile")
 
     expected: str = '''
-@myke.task\ndef hello(name="world"):\n    """Say hello."""\n    print("hello " + name)
+@task\ndef hello(name="world"):\n    """Say hello."""\n    print("hello " + name)
 '''
 
     # 2. ACT

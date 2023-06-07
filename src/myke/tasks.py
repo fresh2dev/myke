@@ -7,9 +7,9 @@ from subprocess import CompletedProcess
 from types import ModuleType
 from typing import Any, Callable, Sequence
 
-from .exceptions import MykeNotFoundError, NoTasksFoundError, TaskAlreadyRegisteredError
-from .globals import MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS
-from .run import run, sh
+from .exceptions import NoTasksFoundError, TaskAlreadyRegisteredError
+from .globals import ROOT_TASK_KEY, TASKS
+from .run import sh
 from .utils import _MykeSourceFileLoader, convert_to_command_string
 
 
@@ -39,9 +39,6 @@ def import_mykefile(path: str) -> None:
     loader = _MykeSourceFileLoader(os.path.relpath(path), path)
     mod: ModuleType = ModuleType(loader.name)
     loader.exec_module(mod)
-
-    if not hasattr(mod, MYKE_VAR_NAME):
-        raise MykeNotFoundError(path)
 
     if len(TASKS) <= n_tasks_before:
         raise NoTasksFoundError(path)

@@ -1,10 +1,6 @@
 from __future__ import annotations
 
 
-class MykeNotFoundError(Exception):
-    ...
-
-
 class TaskAlreadyRegisteredError(Exception):
     ...
 

@@ -4,10 +4,10 @@
 import os
 from typing import Dict, List, Optional, Set, Tuple
 
-import myke
+from myke import arg, import_mykefile, main, shell_task, task
 
 
-@myke.task(root=True)
+@task(root=True)
 def setup():
     """
 
@@ -17,41 +17,41 @@ def setup():
     print("charging lazer beamz")
 
 
-@myke.task
+@task
 def hello(name="world"):
     """Say hello."""
     print("hello " + name)
 
 
-@myke.task(name="hello-named")
+@task(name="hello-named")
 def halo(name="world"):
     print("hello " + name)
 
 
-@myke.task
+@task
 def x_hello_named2(name="world"):
     print("hello " + name)
 
 
-@myke.task
+@task
 def x_hello_named3(name="world"):
     print("hello " + name)
 
 
-@myke.task
-def x_hello_positional(name=myke.arg("world", pos=True)):
+@task
+def x_hello_positional(name=arg("world", pos=True)):
     print("hello " + name)
 
 
-@myke.task
-def x_hello_positional_bool(upper: bool = myke.arg(default=False, pos=True)):
+@task
+def x_hello_positional_bool(upper: bool = arg(default=False, pos=True)):
     txt: str = "hello world"
     if upper:
         txt = txt.upper()
     print(txt)
 
 
-@myke.task_sh
+@shell_task
 def hello_sh(name="world"):
     return f"""
         echo hello {name}
@@ -62,7 +62,7 @@ def hello_sh(name="world"):
     """
 
 
-@myke.task
+@task
 def hello_depends(name="world"):
     output: List[str] = hello_sh_stdout(name)
     assert len(output) == 2
@@ -70,27 +70,27 @@ def hello_depends(name="world"):
     assert output[1] == "woohoo"
 
 
-@myke.task_sh
+@shell_task
 def hello_check():
     return "exit 123"
 
 
-@myke.task_sh(timeout=1)
+@shell_task(timeout=1)
 def hello_timeout():
     return "sleep 2s"
 
 
-@myke.task
-def print_args(args: Optional[List[str]] = myke.arg(pos=True)):
-    myke.echo(args)
+@task
+def print_args(args: Optional[List[str]] = arg(pos=True)):
+    echo(args)
 
 
-@myke.task
-def print_kwargs(kwargs: Optional[Dict[str, str]] = myke.arg(pos=True)):
-    myke.echo(kwargs)
+@task
+def print_kwargs(kwargs: Optional[Dict[str, str]] = arg(pos=True)):
+    echo(kwargs)
 
 
-@myke.task
+@task
 def assert_types(
     xstr,
     xint: int,
@@ -115,7 +115,7 @@ def assert_types(
 dir_name: str = os.path.dirname(__name__)
 other_myke: str = os.path.join(dir_name, "otherMykefile")
 
-myke.import_mykefile(other_myke)
+import_mykefile(other_myke)
 
 if __name__ == "__main__":
-    myke.main(__file__)
+    main(__file__)
