@@ -1,8 +1,10 @@
+"""> Functions for writing."""
+
 import os
+from pathlib import Path
 from typing import Any, List, Optional, Union
 
 from ..globals import DEFAULT_MYKEFILE
-from ..io.read import read
 from ..utils import make_executable
 
 
@@ -26,19 +28,40 @@ class write:
     @staticmethod
     def text(
         content: Union[str, bytes],
-        path: str,
+        path: Union[str, Path],
         append: bool = False,
         overwrite: bool = False,
         encoding: str = "utf-8",
         **kwargs: Any,
     ) -> None:
+        """Write text to a file.
+
+        Args:
+            content:
+            path:
+            append:
+            overwrite:
+            encoding:
+
+        Raises:
+            FileExistsError: if file exists and overwrite is False.
+
+
+        Examples:
+            >>> import myke
+            ...
+            >>> myke.write.text('hello world', '/path/to/file.txt')  # doctest: +SKIP
+        """
         mode_default: str = "w"
 
         mode: str = kwargs.pop("mode", mode_default)
 
-        if os.path.exists(path):
+        if isinstance(path, str):
+            path = Path(path)
+
+        if path.exists():
             if overwrite:
-                os.remove(path)
+                path.unlink()
             elif append and mode == mode_default:
                 mode = "a"
             else:
@@ -48,21 +71,38 @@ class write:
             if isinstance(content, bytes):
                 mode += "b"
 
-            if not os.path.exists(path):
+            if not path.exists():
                 mode += "+"
 
-        with open(path, mode=mode, encoding=encoding, **kwargs) as f:
+        with path.open(mode=mode, encoding=encoding, **kwargs) as f:
             f.write(content)
 
     @classmethod
     def lines(
         cls,
         content: List[Optional[str]],
-        path: str,
+        path: Union[str, Path],
         append: bool = False,
         overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
+        """Write lines of text to a file.
+
+        Args:
+            content:
+            path:
+            append:
+            overwrite:
+
+        Raises:
+            FileExistsError: if file exists and overwrite is False.
+
+
+        Examples:
+            >>> import myke
+            ...
+            >>> myke.write.text(['hello', 'world'], '/path/to/file.txt')  # doctest: +SKIP
+        """
         if isinstance(content, str):
             raise TypeError("expected a list of strings, not a string")
         cls.text(
@@ -74,65 +114,54 @@ class write:
         )
 
     @classmethod
-    def mykefile(cls, path: Optional[str] = None) -> None:
-        if not path:
-            path = os.getcwd()
+    def mykefile(
+        cls,
+        path: Union[None, str, Path] = None,
+    ) -> None:
+        """Create a new Mykefile.
 
-        if os.path.isdir(path):
-            path = os.path.join(path, DEFAULT_MYKEFILE)
+        Args:
+            path:
+
+        Raises:
+            FileExistsError: if file exists and overwrite is False.
+
+
+        Examples:
+            >>> import myke
+            ...
+            >>> myke.write.mykefile('/path/to/Mykefile')  # doctest: +SKIP
+        """
+        if not path:
+            path = Path.cwd()
+        elif isinstance(path, str):
+            path = Path(path)
+
+        if path.is_dir():
+            path = path / DEFAULT_MYKEFILE
 
         cls.text(
             path=path,
-            content="""#!/usr/bin/env python3
-# type: ignore
-# pylint: skip-file
-# flake8: noqa
-import myke  # noqa
+            content=r"""from myke import task, shell_task
 
-myke.require(
-    pip_args=[
-        "--extra-index-url",
-        "https://codeberg.org/api/packages/Fresh2dev/pypi/simple",
-    ],
-    mykefiles="0.0.1a3.dev44",
-)
-from mykefiles import hello_world  # noqa
+@task(root=True)
+def setup():
+    # setup
+    ...
 
-# @myke.task(root=True)
-# def setup():
-#     # setup
-#     ...
-#
-#     yield
-#
-#     # teardown
-#     ...
+    yield
 
+    # teardown
+    ...
 
-if __name__ == "__main__":
-    myke.main(__file__)
+@task
+def do_work():
+    ...
+
+@shell_task
+def more_work():
+    return 'echo ...'
 """,
         )
 
         make_executable(path)
-
-    @classmethod
-    def url(
-        cls,
-        addr: str,
-        path: Optional[str] = None,
-        append: bool = False,
-        overwrite: bool = False,
-        **kwargs: Any,
-    ) -> str:
-        if not path:
-            path = os.getcwd()
-
-        if os.path.isdir(path):
-            path = os.path.join(path, os.path.basename(addr))
-
-        resp: str = read.url(addr)
-
-        cls.text(content=resp, path=path, append=append, overwrite=overwrite, **kwargs)
-
-        return path

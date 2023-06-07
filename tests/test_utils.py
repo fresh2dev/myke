@@ -17,4 +17,11 @@ def test_is_version():
 
 
 def test_get_repo_root():
-    assert isinstance(myke.utils.get_repo_root(), Path)
+    assert (
+        myke.utils.get_repo_root()
+        == myke.utils.get_repo_root(Path.cwd() / "README.md")
+        == myke.utils.get_repo_root(Path.cwd() / ".git")
+        == myke.utils.get_repo_root(
+            Path.cwd() / ".git" / "refs" / "heads" / "main",
+        )
+    )

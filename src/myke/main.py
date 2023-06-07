@@ -1,10 +1,11 @@
 import os
 import sys
+from contextlib import suppress
 from dataclasses import dataclass
 from fnmatch import fnmatch
 from inspect import getsource
 from pathlib import Path
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable, List, Optional, Union
 
 import yapx
 
@@ -12,51 +13,32 @@ from .__version__ import __version__
 from .exceptions import NoTasksFoundError
 from .globals import DEFAULT_MYKEFILE, MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS
 from .io.echo import echo
-from .io.read import read
 from .io.write import write
-from .tasks import import_module
+from .tasks import import_module, import_mykefile
 from .types import Annotated
 from .utils import get_repo_root
 
 __all__ = ["__version__", "main", "sys"]
 
 
-def main(_file: Optional[str] = None) -> None:
+def main(_file: Optional[Union[str, Path]] = None) -> None:
     @dataclass
     class MykeArgs(yapx.types.Dataclass):
         file: Annotated[
-            str,
+            Optional[Path],
             yapx.arg(
-                default=_file if _file else DEFAULT_MYKEFILE,
+                default=_file if _file else None,
                 flags=["--myke-file"],
                 env="MYKE_FILE",
                 group="myke args",
             ),
         ]
-        file_paths: Annotated[
-            List[str],
-            yapx.arg(
-                default=lambda: [os.path.expanduser("~"), os.getcwd()],
-                flags=["--myke-file-paths"],
-                env="MYKE_FILE_PATHS",
-                group="myke args",
-            ),
-        ]
-        env_file: Annotated[
+        module: Annotated[
             Optional[str],
             yapx.arg(
                 default=None,
-                flags=["--myke-env-file"],
-                env="MYKE_ENV_FILE",
-                group="myke args",
-            ),
-        ]
-        update_modules: Annotated[
-            bool,
-            yapx.arg(
-                default=False,
-                flags=["--myke-update-modules"],
-                env="MYKE_UPDATE_MODULES",
+                flags=["--myke-module"],
+                env="MYKE_MODULE",
                 group="myke args",
             ),
         ]
@@ -96,15 +78,6 @@ def main(_file: Optional[str] = None) -> None:
                 flags=["--myke-explain"],
             ),
         ]
-        version: Annotated[
-            Optional[bool],
-            yapx.arg(
-                default=None,
-                group="myke args",
-                exclusive=True,
-                flags=["--myke-version"],
-            ),
-        ]
         create: Annotated[
             Optional[bool],
             yapx.arg(
@@ -114,13 +87,21 @@ def main(_file: Optional[str] = None) -> None:
                 flags=["--myke-create"],
             ),
         ]
+        version: Annotated[
+            Optional[bool],
+            yapx.arg(
+                default=None,
+                group="myke args",
+                exclusive=True,
+                flags=["--myke-version"],
+            ),
+        ]
 
-    prog: str = _file if _file else MYKE_VAR_NAME
+    prog: str = str(_file) if _file else MYKE_VAR_NAME
 
     parser = yapx.ArgumentParser(
         prog=prog,
         add_help=False,
-        description="Parameters for Myke:",
     )
     parser.add_arguments(MykeArgs)
 
@@ -136,58 +117,55 @@ def main(_file: Optional[str] = None) -> None:
     if myke_args.version:
         echo(__version__)
         parser.exit()
-    elif myke_args.create:
-        write.mykefile(myke_args.file)
-        echo(f"Created: {myke_args.file}")
-        parser.exit()
-
-    if myke_args.env_file:
-        os.environ.update(read.envfile(myke_args.env_file))
-
-    if myke_args.update_modules:
-        os.environ["MYKE_UPDATE_MODULES"] = "1"
-
-    repo_root: Optional[Path] = get_repo_root()
-    if repo_root:
-        os.chdir(repo_root)
 
     if _file:
-        if not os.path.exists(_file):
+        if not isinstance(_file, Path):
+            _file = Path(_file)
+        if not _file.exists():
             raise FileNotFoundError(_file)
         if not TASKS:
             raise NoTasksFoundError(_file)
-        _file = os.path.abspath(_file)
+        _file = _file.absolute()
 
-    mykefiles: List[str] = (
-        [myke_args.file]
-        if os.path.dirname(myke_args.file)
-        else [
-            y
-            for x in myke_args.file_paths
-            for y in [os.path.join(x, myke_args.file)]
-            if os.path.exists(y)
-        ]
-    )
+    if myke_args.file:
+        myke_args.file = myke_args.file.absolute()
+    elif Path(DEFAULT_MYKEFILE).exists():
+        myke_args.file = Path(DEFAULT_MYKEFILE).absolute()
 
-    for f in mykefiles:
-        f = os.path.abspath(f)
-        try:
-            if f != _file:
-                import_module(f)
-            elif not TASKS:
-                raise NoTasksFoundError(f)
-        except FileNotFoundError:
-            parser.print_help()
-            echo(
-                (
-                    f"{os.linesep}"
-                    f"'{myke_args.file}' not found. Create it using:"
-                    f"{os.linesep}"
-                    f"> {prog} --myke-create --myke-file '{f}'"
-                    f"{os.linesep}"
-                ),
-            )
-            parser.exit()
+    with suppress(FileNotFoundError):
+        repo_root: Optional[Path] = get_repo_root()
+        if repo_root:
+            os.chdir(repo_root)
+
+    if not myke_args.file and Path(DEFAULT_MYKEFILE).exists():
+        myke_args.file = Path(DEFAULT_MYKEFILE).absolute()
+
+    if myke_args.create:
+        out_file: Path = myke_args.file if myke_args.file else Path(DEFAULT_MYKEFILE)
+        write.mykefile(str(out_file))
+        echo(f"Created: {out_file}")
+        parser.exit()
+
+    try:
+        if myke_args.file and (not _file or not myke_args.file.samefile(_file)):
+            import_mykefile(str(myke_args.file))
+            os.environ["MYKE_FILE"] = str(myke_args.file)
+    except FileNotFoundError:
+        parser.print_help()
+        echo(
+            (
+                f"{os.linesep}"
+                f"'{myke_args.file}' not found. Create it using:"
+                f"{os.linesep}"
+                f"> {prog} --myke-create --myke-file '{myke_args.file}'"
+                f"{os.linesep}"
+            ),
+        )
+        parser.exit()
+
+    if myke_args.module:
+        import_module(myke_args.module)
+        os.environ["MYKE_MODULE"] = myke_args.module
 
     root_task: Optional[Callable[..., Any]] = TASKS.pop(ROOT_TASK_KEY, None)
 
@@ -208,26 +186,36 @@ def main(_file: Optional[str] = None) -> None:
 
         parser.exit()
 
-    if myke_args.help or (not task_args and not myke_args.task_help_full):
+    show_tui: bool = False
+    if not task_args and not myke_args.help:
+        show_tui = yapx.utils.is_tui_available()
+        myke_args.help = not show_tui
+
+    if myke_args.help:
         parser.print_help()
         echo.tasks(prog=prog)
         parser.exit()
 
-    if task_args and "*" in task_args[0]:
+    if task_args:
         for k in list(TASKS):
             if not fnmatch(k, task_args[0]):
                 del TASKS[k]
-        if not myke_args.task_help_full:
+        if not TASKS and not myke_args.task_help_full:
             echo.tasks(prog=prog)
             parser.exit()
 
     if myke_args.task_help:
         task_args.append("--help")
 
+    tui_flags: Optional[List[str]] = ["--tui"] if show_tui else None
+    if tui_flags:
+        task_args.extend(tui_flags)
+
     yapx.run(
         root_task,
         _args=task_args,
         _prog=prog,
         _print_help=bool(myke_args.task_help_full),
+        _tui_flags=tui_flags,
         **TASKS,
     )

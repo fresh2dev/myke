@@ -9,28 +9,29 @@ from .io.echo import echo
 from .io.read import read
 from .io.write import write
 from .main import main
-from .sh import require, run, sh, sh_stdout, sh_stdout_lines
-from .tasks import (
-    add_tasks,
-    import_module,
-    install_module,
-    task,
-    task_sh,
-    task_sh_stdout,
-    task_sh_stdout_lines,
+from .run import (
+    require,
+    run,
+    run_stdout,
+    run_stdout_lines,
+    sh,
+    sh_stdout,
+    sh_stdout_lines,
 )
+from .tasks import add_tasks, import_module, import_mykefile, shell_task, task, task_sh
 
 __all__ = [
     "__version__",
     "TASKS",
     "task",
+    "shell_task",
     "task_sh",
-    "task_sh_stdout",
-    "task_sh_stdout_lines",
     "add_tasks",
+    "import_mykefile",
     "import_module",
-    "install_module",
     "run",
+    "run_stdout",
+    "run_stdout_lines",
     "sh",
     "sh_stdout",
     "sh_stdout_lines",

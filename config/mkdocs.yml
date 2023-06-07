@@ -1,6 +1,6 @@
 site_name: "myke"
 site_description: "myke Docs"
-site_url: !ENV [MKDOCS_SITE_URL, "https://www.Fresh2.dev/code/r/myke/i"]
+site_url: !ENV [MKDOCS_SITE_URL, "https://www.f2dv.com/code/r/myke/i"]
 repo_url: "https://www.github.com/fresh2dev/myke"
 repo_name: "fresh2dev/myke"
 edit_uri: "edit/main/docs"
@@ -21,8 +21,11 @@ nav:
   - Home: index.md
   - Changelog: changelog.md
   - License: license.md
+  - Articles:
+      - 'page/quickstart.md'
+      - 'page/related.md'
   - Reference: reference/
-  - Comments: comments.md
+  - Discussion: comments.md
 
 watch:
   - ../src
@@ -33,7 +36,7 @@ theme:
   custom_dir: overrides
   palette:
     - scheme: slate
-      primary: black
+      primary: deep purple
       toggle:
         icon: material/toggle-switch-off-outline
         name: Switch to light mode
@@ -100,6 +103,6 @@ plugins:
             show_root_heading: false
             show_root_toc_entry: false
             show_root_full_path: false
-            show_root_members_full_path: true
-            show_object_full_path: true
+            show_root_members_full_path: false
+            show_object_full_path: false
             show_category_heading: true

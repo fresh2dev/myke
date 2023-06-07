@@ -1,25 +1,41 @@
+"""> Functions for registering tasks with myke."""
+
 from __future__ import annotations
 
 import collections.abc
 import os
 from functools import partial, wraps
+from subprocess import CompletedProcess
 from types import ModuleType
 from typing import Any, Callable, Sequence
 
-from .exceptions import MykeNotFoundError, NoTasksFoundError, TaskAlreadyRegisteredError
-from .globals import MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS
-from .io.read import read
-from .io.write import write
-from .sh import sh
-from .utils import (
-    _MykeSourceFileLoader,
-    convert_to_command_string,
-    make_executable,
-    split_and_trim_text,
-)
+from .exceptions import NoTasksFoundError, TaskAlreadyRegisteredError
+from .globals import ROOT_TASK_KEY, TASKS
+from .run import sh
+from .utils import _MykeSourceFileLoader, convert_to_command_string
 
 
 def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
+    """Register the given callable(s) with myke.
+
+    Arguments:
+        *args:
+        **kwargs:
+
+    Raises:
+        TaskAlreadyRegisteredError:
+
+    Examples:
+        >>> import myke
+        ...
+        >>> def say_hello(name):
+        ...    print(f'Hello {name}.')
+        ...
+        >>> def say_goodbye(name):
+        ...    print(f'Goodbye {name}.')
+        ...
+        >>> myke.add_tasks(say_hello, say_goodbye)
+    """
     kwargs.update({x.__name__: x for x in args})
 
     kwargs = {
@@ -39,59 +55,50 @@ def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
         TASKS[k] = v
 
 
-def import_module(*mykefiles: str, overwrite: bool | None = None) -> None:
+def import_mykefile(path: str) -> None:
+    """Import tasks from another Mykefile.
+
+    Args:
+        path: path to the Mykefile
+
+    Raises:
+        NoTasksFoundError:
+
+    Examples:
+        >>> import myke
+        ...
+        >>> myke.import_mykefile('/path/to/tasks.py')  # doctest: +SKIP
+    """
     n_tasks_before: int = len(TASKS)
-    for m in mykefiles:
-        if m.startswith("https://"):
-            m = install_module(m, overwrite=overwrite)
 
-        loader = _MykeSourceFileLoader(os.path.relpath(m), m)
-        mod: ModuleType = ModuleType(loader.name)
-        loader.exec_module(mod)
+    loader = _MykeSourceFileLoader(os.path.relpath(path), path)
+    mod: ModuleType = ModuleType(loader.name)
+    loader.exec_module(mod)
 
-        if not hasattr(mod, MYKE_VAR_NAME):
-            raise MykeNotFoundError(m)
-
-        n_tasks_after: int = len(TASKS)
-        if n_tasks_after <= n_tasks_before:
-            raise NoTasksFoundError(m)
-        n_tasks_before = n_tasks_after
+    if len(TASKS) <= n_tasks_before:
+        raise NoTasksFoundError(path)
 
 
-def install_module(
-    url: str,
-    path: str | None = None,
-    fail_if_exists: bool | None = None,
-    overwrite: bool | None = None,
-) -> str:
-    if overwrite is None:
-        overwrite = bool(os.getenv("MYKE_UPDATE_MODULES"))
+def import_module(name: str) -> None:
+    """Import tasks from the given Python module.
 
-    if not url.startswith("https://"):
-        raise ValueError("Download URLs must start with 'https://'")
+    Args:
+        name: name of the module.
 
-    if path is None:
-        path = "tasks"
+    Raises:
+        NoTasksFoundError:
 
-        if not os.path.exists(path):
-            os.mkdir(path)
+    Examples:
+        >>> import myke
+        ...
+        >>> myke.import_module('python_pkg.python_module')  # doctest: +SKIP
+    """
+    n_tasks_before: int = len(TASKS)
 
-        path = os.path.join(path, os.path.basename(url))
+    __import__(name)
 
-    if not overwrite and not fail_if_exists and os.path.exists(path):
-        return path
-
-    resp_text: str = read.url(url)
-
-    import_myke: str = f"import {MYKE_VAR_NAME}"
-    if import_myke not in resp_text:
-        raise MykeNotFoundError(f'"{import_myke}" not found response text of {url}')
-
-    write(resp_text, path=path, overwrite=overwrite)
-
-    make_executable(path)
-
-    return path
+    if len(TASKS) <= n_tasks_before:
+        raise NoTasksFoundError(name)
 
 
 def task(
@@ -100,6 +107,25 @@ def task(
     name: str | None = None,
     root: bool | None = False,
 ) -> Callable[..., Any] | Callable[..., Callable[..., Any]]:
+    """Function decorator to register functions with myke.
+
+    Args:
+        name: name of the command.
+        root: if True, import this as the root command.
+
+    Examples:
+        >>> from myke import task
+        ...
+        >>> @task  # doctest: +SKIP
+        ... def say_hello(name):
+        ...    print(f'Hello {name}.')
+        ...
+        >>> @task  # doctest: +SKIP
+        ... def say_goodbye(name):
+        ...    print(f'Goodbye {name}.')
+        ...
+    """
+
     if not func:
         return partial(task, name=name, root=root)
 
@@ -114,7 +140,7 @@ def task(
     return func
 
 
-def task_sh(
+def shell_task(
     func: Callable[..., str | Sequence[str]] | None = None,
     *,
     name: str | None = None,
@@ -128,12 +154,33 @@ def task_sh(
     timeout: float | None = None,
     executable: str | None = None,
 ) -> (
-    Callable[..., tuple[str | None, str | None, int]]
-    | Callable[..., Callable[..., tuple[str | None, str | None, int]]]
+    Callable[..., CompletedProcess[bytes | str]]
+    | Callable[..., Callable[..., CompletedProcess[bytes | str]]]
 ):
+    """Function decorator to register shell commands with myke.
+
+    myke expects the function to return a string of one or more shell-commands,
+    and will invoke the commands using `myke.run(..., shell=True)`.
+
+    Args:
+        name: name of the command.
+        root: if True, import this as the root command.
+
+    Examples:
+        >>> from myke import shell_task
+        ...
+        >>> @shell_task  # doctest: +SKIP
+        ... def say_hello(name):
+        ...    return f"echo 'Hello {name}.'"
+        ...
+        >>> @shell_task  # doctest: +SKIP
+        ... def say_goodbye(name):
+        ...    return f"echo 'Goodbye {name}.'"
+        ...
+    """
     if not func:
         return partial(
-            task_sh,
+            shell_task,
             name=name,
             root=root,
             capture_output=capture_output,
@@ -150,14 +197,14 @@ def task_sh(
     def _inner_func(*args: Any, **kwargs: Any) -> tuple[str | None, str | None, int]:
         assert func
 
-        func_script: str | Sequence[str] = func(*args, **kwargs)
+        func_script: str = func(*args, **kwargs)
 
         if not isinstance(func_script, str) and not isinstance(
             func_script,
             collections.abc.Sequence,
         ):
             raise TypeError(
-                "Expected a string or list of strings to be returned for `sh` function",
+                "Expected a string to be returned for the `shell_task`",
             )
 
         return sh(
@@ -178,71 +225,5 @@ def task_sh(
     return task(_inner_func, name=name, root=root)
 
 
-def _task_sh_stdout_lines(
-    func: Callable[..., str | Sequence[str]] | None = None,
-    *,
-    name: str | None = None,
-    root: bool | None = False,
-    echo: bool | None = False,
-    check: bool | None = True,
-    cwd: str | None = None,
-    env: dict[str, str] | None = None,
-    env_update: dict[str, str | None] | None = None,
-    timeout: float | None = None,
-    executable: str | None = None,
-    join_lines: bool | None = False,
-) -> Callable[..., str | list[str]] | Callable[..., Callable[..., str | list[str]]]:
-    if not func:
-        return partial(
-            task_sh_stdout_lines,
-            name=name,
-            root=root,
-            echo=echo,
-            check=check,
-            cwd=cwd,
-            env=env,
-            env_update=env_update,
-            timeout=timeout,
-            executable=executable,
-        )
-
-    @wraps(func)
-    def _inner_func(*args: Any, **kwargs: Any) -> str | list[str]:
-        assert func
-        stdout, *_ = sh(
-            func(*args, **kwargs),
-            capture_output=True,
-            echo=echo,
-            check=check,
-            cwd=cwd,
-            env=env,
-            env_update=env_update,
-            timeout=timeout,
-            executable=executable,
-        )
-
-        stdout_split: list[str] = split_and_trim_text(stdout)
-
-        return os.linesep.join(stdout_split) if join_lines else stdout_split
-
-    if not name:
-        name = func.__name__
-
-    return task(_inner_func, name=name, root=root)
-
-
-@wraps(_task_sh_stdout_lines)
-def task_sh_stdout_lines(
-    *args: Any,
-    **kwargs: Any,
-) -> Callable[..., list[str]] | Callable[..., Callable[..., list[str]]]:
-    return _task_sh_stdout_lines(*args, **kwargs)  # type: ignore
-
-
-@wraps(_task_sh_stdout_lines)
-def task_sh_stdout(
-    *args: Any,
-    **kwargs: Any,
-) -> Callable[..., str] | Callable[..., Callable[..., str]]:
-    kwargs["join_lines"] = True
-    return _task_sh_stdout_lines(*args, **kwargs)  # type: ignore
+# TODO: deprecate
+task_sh = shell_task
