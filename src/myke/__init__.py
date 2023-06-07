@@ -18,13 +18,13 @@ from .run import (
     sh_stdout,
     sh_stdout_lines,
 )
-from .tasks import add_tasks, import_module, import_mykefile, task, task_run, task_sh
+from .tasks import add_tasks, import_module, import_mykefile, shell_task, task, task_sh
 
 __all__ = [
     "__version__",
     "TASKS",
     "task",
-    "task_run",
+    "shell_task",
     "task_sh",
     "add_tasks",
     "import_mykefile",

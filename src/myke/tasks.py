@@ -76,7 +76,7 @@ def task(
     return func
 
 
-def task_run(
+def shell_task(
     func: Callable[..., str | Sequence[str]] | None = None,
     *,
     name: str | None = None,
@@ -95,71 +95,7 @@ def task_run(
 ):
     if not func:
         return partial(
-            task_sh,
-            name=name,
-            root=root,
-            capture_output=capture_output,
-            echo=echo,
-            check=check,
-            cwd=cwd,
-            env=env,
-            env_update=env_update,
-            timeout=timeout,
-            executable=executable,
-        )
-
-    @wraps(func)
-    def _inner_func(*args: Any, **kwargs: Any) -> tuple[str | None, str | None, int]:
-        assert func
-
-        func_script: str | Sequence[str] = func(*args, **kwargs)
-
-        if not isinstance(func_script, str) and not isinstance(
-            func_script,
-            collections.abc.Sequence,
-        ):
-            raise TypeError(
-                "Expected a string or list of strings to be returned for `sh` function",
-            )
-
-        return run(
-            func_script,
-            capture_output=capture_output,
-            echo=echo,
-            check=check,
-            cwd=cwd,
-            env=env,
-            env_update=env_update,
-            timeout=timeout,
-            executable=executable,
-        )
-
-    if not name:
-        name = func.__name__
-
-    return task(_inner_func, name=name, root=root)
-
-
-def task_sh(
-    func: Callable[..., str | Sequence[str]] | None = None,
-    *,
-    name: str | None = None,
-    root: bool | None = False,
-    capture_output: bool | None = False,
-    echo: bool | None = True,
-    check: bool | None = True,
-    cwd: str | None = None,
-    env: dict[str, str] | None = None,
-    env_update: dict[str, str | None] | None = None,
-    timeout: float | None = None,
-    executable: str | None = None,
-) -> (
-    Callable[..., CompletedProcess[bytes | str]]
-    | Callable[..., Callable[..., CompletedProcess[bytes | str]]]
-):
-    if not func:
-        return partial(
-            task_sh,
+            shell_task,
             name=name,
             root=root,
             capture_output=capture_output,
@@ -183,7 +119,7 @@ def task_sh(
             collections.abc.Sequence,
         ):
             raise TypeError(
-                "Expected a string to be returned for `sh` function",
+                "Expected a string to be returned for the `shell_task`",
             )
 
         return sh(
@@ -202,3 +138,7 @@ def task_sh(
         name = func.__name__
 
     return task(_inner_func, name=name, root=root)
+
+
+# TODO: deprecate
+task_sh = shell_task
