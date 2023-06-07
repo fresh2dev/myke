@@ -83,34 +83,25 @@ class write:
 
         cls.text(
             path=path,
-            content="""#!/usr/bin/env python3
-# type: ignore
-# pylint: skip-file
-# flake8: noqa
-import myke  # noqa
+            content="""from myke import task, shell_task
 
-myke.require(
-    pip_args=[
-        "--extra-index-url",
-        "https://codeberg.org/api/packages/Fresh2dev/pypi/simple",
-    ],
-    mykefiles="0.0.1a3.dev44",
-)
-from mykefiles import hello_world  # noqa
+@task(root=True)
+def setup():
+    # setup
+    ...
 
-# @myke.task(root=True)
-# def setup():
-#     # setup
-#     ...
-#
-#     yield
-#
-#     # teardown
-#     ...
+    yield
 
+    # teardown
+    ...
 
-if __name__ == "__main__":
-    myke.main(__file__)
+@task
+def do_work():
+    ...
+
+@shell_task
+def more_work():
+    return "echo ..."
 """,
         )
 
