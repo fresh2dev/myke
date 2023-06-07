@@ -119,19 +119,6 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
         echo(__version__)
         parser.exit()
 
-    if not myke_args.file and Path(DEFAULT_MYKEFILE).exists():
-        myke_args.file = Path(DEFAULT_MYKEFILE)
-
-    if myke_args.create:
-        write.mykefile(str(myke_args.file))
-        echo(f"Created: {myke_args.file}")
-        parser.exit()
-
-    with suppress(FileNotFoundError):
-        repo_root: Optional[Path] = get_repo_root()
-        if repo_root:
-            os.chdir(repo_root)
-
     if _file:
         if not isinstance(_file, Path):
             _file = Path(_file)
@@ -141,9 +128,29 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
             raise NoTasksFoundError(_file)
         _file = _file.absolute()
 
+    if myke_args.file:
+        myke_args.file = myke_args.file.absolute()
+    elif Path(DEFAULT_MYKEFILE).exists():
+        myke_args.file = Path(DEFAULT_MYKEFILE).absolute()
+
+    with suppress(FileNotFoundError):
+        repo_root: Optional[Path] = get_repo_root()
+        if repo_root:
+            os.chdir(repo_root)
+
+    if not myke_args.file and Path(DEFAULT_MYKEFILE).exists():
+        myke_args.file = Path(DEFAULT_MYKEFILE).absolute()
+
+    if myke_args.create:
+        out_file: Path = myke_args.file if myke_args.file else Path(DEFAULT_MYKEFILE)
+        write.mykefile(str(out_file))
+        echo(f"Created: {out_file}")
+        parser.exit()
+
     try:
         if myke_args.file and (not _file or not myke_args.file.samefile(_file)):
-            import_mykefile(str(myke_args.file.absolute()))
+            import_mykefile(str(myke_args.file))
+            os.environ["MYKE_FILE"] = str(myke_args.file)
     except FileNotFoundError:
         parser.print_help()
         echo(
@@ -159,6 +166,7 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
 
     if myke_args.module:
         import_module(myke_args.module)
+        os.environ["MYKE_MODULE"] = myke_args.module
 
     root_task: Optional[Callable[..., Any]] = TASKS.pop(ROOT_TASK_KEY, None)
 
