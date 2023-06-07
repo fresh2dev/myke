@@ -96,15 +96,6 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
                 flags=["--myke-version"],
             ),
         ]
-        show_tui: Annotated[
-            Optional[bool],
-            yapx.arg(
-                default=None,
-                group="myke args",
-                exclusive=True,
-                flags=["--tui", "--myke-tui"],
-            ),
-        ]
 
     prog: str = str(_file) if _file else MYKE_VAR_NAME
 
@@ -188,9 +179,10 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
 
         parser.exit()
 
-    if not task_args and not myke_args.help and not myke_args.show_tui:
-        myke_args.show_tui = yapx.utils.is_tui_available()
-        myke_args.help = not myke_args.show_tui
+    show_tui: bool = False
+    if not task_args and not myke_args.help:
+        show_tui = yapx.utils.is_tui_available()
+        myke_args.help = not show_tui
 
     if myke_args.help:
         parser.print_help()
@@ -208,7 +200,7 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
     if myke_args.task_help:
         task_args.append("--help")
 
-    tui_flags: Optional[List[str]] = ["--tui"] if myke_args.show_tui else None
+    tui_flags: Optional[List[str]] = ["--tui"] if show_tui else None
     if tui_flags:
         task_args.extend(tui_flags)
 
