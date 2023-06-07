@@ -1,3 +1,5 @@
+"""> Functions for registering tasks with myke."""
+
 from __future__ import annotations
 
 import collections.abc
@@ -14,6 +16,26 @@ from .utils import _MykeSourceFileLoader, convert_to_command_string
 
 
 def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
+    """Register the given callable(s) with myke.
+
+    Arguments:
+        *args:
+        **kwargs:
+
+    Raises:
+        TaskAlreadyRegisteredError:
+
+    Examples:
+        >>> import myke
+        ...
+        >>> def say_hello(name):
+        ...    print(f'Hello {name}.')
+        ...
+        >>> def say_goodbye(name):
+        ...    print(f'Goodbye {name}.')
+        ...
+        >>> myke.add_tasks(say_hello, say_goodbye)
+    """
     kwargs.update({x.__name__: x for x in args})
 
     kwargs = {
@@ -34,6 +56,19 @@ def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
 
 
 def import_mykefile(path: str) -> None:
+    """Import tasks from another Mykefile.
+
+    Args:
+        path: path to the Mykefile
+
+    Raises:
+        NoTasksFoundError:
+
+    Examples:
+        >>> import myke
+        ...
+        >>> myke.import_mykefile('/path/to/tasks.py')  # doctest: +SKIP
+    """
     n_tasks_before: int = len(TASKS)
 
     loader = _MykeSourceFileLoader(os.path.relpath(path), path)
@@ -45,6 +80,19 @@ def import_mykefile(path: str) -> None:
 
 
 def import_module(name: str) -> None:
+    """Import tasks from the given Python module.
+
+    Args:
+        name: name of the module.
+
+    Raises:
+        NoTasksFoundError:
+
+    Examples:
+        >>> import myke
+        ...
+        >>> myke.import_module('python_pkg.python_module')  # doctest: +SKIP
+    """
     n_tasks_before: int = len(TASKS)
 
     __import__(name)
@@ -59,6 +107,25 @@ def task(
     name: str | None = None,
     root: bool | None = False,
 ) -> Callable[..., Any] | Callable[..., Callable[..., Any]]:
+    """Function decorator to register functions with myke.
+
+    Args:
+        name: name of the command.
+        root: if True, import this as the root command.
+
+    Examples:
+        >>> from myke import task
+        ...
+        >>> @task  # doctest: +SKIP
+        ... def say_hello(name):
+        ...    print(f'Hello {name}.')
+        ...
+        >>> @task  # doctest: +SKIP
+        ... def say_goodbye(name):
+        ...    print(f'Goodbye {name}.')
+        ...
+    """
+
     if not func:
         return partial(task, name=name, root=root)
 
@@ -90,6 +157,27 @@ def shell_task(
     Callable[..., CompletedProcess[bytes | str]]
     | Callable[..., Callable[..., CompletedProcess[bytes | str]]]
 ):
+    """Function decorator to register shell commands with myke.
+
+    myke expects the function to return a string of one or more shell-commands,
+    and will invoke the commands using `myke.run(..., shell=True)`.
+
+    Args:
+        name: name of the command.
+        root: if True, import this as the root command.
+
+    Examples:
+        >>> from myke import shell_task
+        ...
+        >>> @shell_task  # doctest: +SKIP
+        ... def say_hello(name):
+        ...    return f"echo 'Hello {name}.'"
+        ...
+        >>> @shell_task  # doctest: +SKIP
+        ... def say_goodbye(name):
+        ...    return f"echo 'Goodbye {name}.'"
+        ...
+    """
     if not func:
         return partial(
             shell_task,

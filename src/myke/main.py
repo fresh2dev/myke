@@ -102,7 +102,6 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
     parser = yapx.ArgumentParser(
         prog=prog,
         add_help=False,
-        description="Parameters for Myke:",
     )
     parser.add_arguments(MykeArgs)
 

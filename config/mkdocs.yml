@@ -23,6 +23,7 @@ nav:
   - License: license.md
   - Articles:
       - 'page/quickstart.md'
+      - 'page/related.md'
   - Reference: reference/
   - Discussion: comments.md
 

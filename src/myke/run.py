@@ -1,3 +1,5 @@
+"""> Functions that wrap around `subprocess.run` for added convenience."""
+
 from __future__ import annotations
 
 import json
@@ -30,6 +32,31 @@ def run(
     shell: bool | None = None,
     **kwargs: Any,
 ) -> subprocess.CompletedProcess[bytes | str]:
+    r"""
+
+    Args:
+        args:
+        capture_output:
+        echo:
+        check:
+        env:
+        env_update:
+        shell:
+
+    Examples:
+        >>> import myke
+        ...
+        >>> myke.run(["python", "-c", "print('Hello World.')"])
+        CompletedProcess(args=['python', '-c', "print('Hello World.')"], returncode=0)
+        >>> myke.run("echo 'Hello World.'")
+        CompletedProcess(args="echo 'Hello World.'", returncode=0)
+        >>> p = myke.run("echo 'Hello World.'", capture_output=True, echo=False)
+        >>> p.stdout
+        b'Hello World.\n'
+        >>> p = myke.run("exit 123", check=False)
+        >>> p.returncode
+        123
+    """
     if shell is None:
         shell = isinstance(args, str) and " " in args
 
@@ -71,6 +98,14 @@ def run(
 
 @wraps(run)
 def run_stdout(*args: Any, **kwargs: Any) -> str:
+    """Shorthand for:
+
+    `myke.run(..., capture_output=True, text=True, echo=False).stdout.strip()`
+
+    Examples:
+        >>> myke.run_stdout("echo 'Hello World.'")
+        Hello World.
+    """
     kwargs["capture_output"] = True
     kwargs["text"] = True
     kwargs["echo"] = kwargs.get("echo", False)
@@ -80,21 +115,34 @@ def run_stdout(*args: Any, **kwargs: Any) -> str:
 
 @wraps(run)
 def run_stdout_lines(*args: Any, **kwargs: Any) -> list[str]:
+    """Similar to...
+
+    `myke.run_stdout(...)`
+
+    ...except that text is split on newlines and stripped of empty elements.
+
+    Examples:
+        >>> myke.run_stdout("echo '   Hello World.   ' '  ' '   Goodbye World.   '")
+        ['Hello World.', 'Goodbye World.']
+    """
     return split_and_trim_text(run_stdout(*args, **kwargs))
 
 
 @wraps(run)
 def sh(*args: Any, **kwargs: Any) -> subprocess.CompletedProcess[bytes | str]:
+    """Shorthand for: `myke.run(..., shell=True)`"""
     return run(*args, shell=True, **kwargs)
 
 
 @wraps(sh)
 def sh_stdout(*args: Any, **kwargs: Any) -> str:
+    """Shorthand for: `myke.run_stdout(..., shell=True)`"""
     return run_stdout(*args, shell=True, **kwargs)
 
 
 @wraps(sh)
 def sh_stdout_lines(*args: Any, **kwargs: Any) -> list[str]:
+    """Shorthand for: `myke.run_stdout_lines(..., shell=True)`"""
     return run_stdout_lines(*args, shell=True, **kwargs)
 
 
@@ -130,6 +178,21 @@ def require(
     skip_check: bool = False,
     **kwargs: str,
 ) -> subprocess.CompletedProcess[str]:
+    """Check for the given modules, and install them if they do not exist.
+
+    Args:
+        *args: modules to require.
+        **kwargs: modules to require.
+        pip_args: args passed to `pip`.
+        skip_check: don't check if module is already installed.
+
+    Examples:
+        >>> import myke
+        ...
+        >>> myke.require('module-a==0.1.*', 'module-b==0.1.*', **{  # doctest: +SKIP
+        ...     'module-c': '0.1.*',
+        ... })
+    """
     if not pip_args:
         pip_args = []
 

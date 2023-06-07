@@ -11,7 +11,7 @@ is_minimal: false
 is_python: true
 license_type: GPLv3
 package_name: myke
-project_description: A dynamic Python task runner.
+project_description: The dynamic Python CLI for task execution.
 project_name: myke
 python_version: '3.7'
 repo_mirror: https://www.f2dv.com/code/r/myke

@@ -7,7 +7,7 @@ name = "myke"
 authors = [
     {name = "Donald Mellenbruch", email = "hello@f2dv.com"},
 ]
-description = "A dynamic Python task runner."
+description = "The dynamic Python CLI for task execution."
 readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.7"

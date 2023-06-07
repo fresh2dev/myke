@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import re
 import stat
 from contextlib import suppress
@@ -32,13 +31,32 @@ def split_and_trim_text(txt: str | None) -> list[str]:
     return [x_trim for x in txt.splitlines() for x_trim in [x.strip()] if x_trim]
 
 
-def make_executable(file: str) -> None:
-    st = os.stat(file)
-    os.chmod(file, st.st_mode | stat.S_IEXEC)
+def make_executable(file: str | Path) -> None:
+    if isinstance(file, str):
+        file = Path(file)
+
+    st = file.stat()
+    file.chmod(st.st_mode | stat.S_IEXEC)
 
 
 def is_version(txt: str) -> bool:
-    # https://github.com/pypa/packaging/blob/main/packaging/version.py
+    """Check if the given text is a value version.
+
+    src: https://github.com/pypa/packaging/blob/main/packaging/version.py
+
+    Args:
+        txt:
+
+    Examples:
+        >>> from myke.utils import is_version
+        ...
+        >>> is_version('abcd')
+        False
+        >>> is_version('0.1.0')
+        True
+        >>> is_version('0.1.0.dev1')
+        True
+    """
     VERSION_PATTERN = r"""
     v?
     (?:
@@ -76,6 +94,25 @@ def is_version(txt: str) -> bool:
 
 
 def get_repo_root(path: str | Path | None = None) -> Path | None:
+    """Return the root a git repository.
+
+    Args:
+        path: path to the git repo.
+
+    Returns:
+        None: if the given path is not a git repo.
+        Path: root path of the git repo.
+
+
+    Raises:
+        FileNotFoundError: if `git` is not found.
+
+    Examples:
+        >>> from myke.utils import get_repo_root
+        ...
+        >>> get_repo_root('/my/git/repo/subdir')  # doctest: +SKIP
+        Path('/my/git/repo')
+    """
     if not which("git"):
         raise FileNotFoundError("git")
 
