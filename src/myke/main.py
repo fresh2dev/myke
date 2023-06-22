@@ -69,6 +69,15 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
                 flags=["--myke-help"],
             ),
         ]
+        tui: Annotated[
+            Optional[bool],
+            yapx.arg(
+                default=None,
+                group="myke args",
+                exclusive=True,
+                flags=["--tui"],
+            ),
+        ]
         explain: Annotated[
             Optional[bool],
             yapx.arg(
@@ -186,8 +195,16 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
 
         parser.exit()
 
-    show_tui: bool = False
-    if not task_args and not myke_args.help:
+    show_tui: Optional[bool] = myke_args.tui
+    if not any(
+        [
+            show_tui,
+            task_args,
+            myke_args.help,
+            myke_args.task_help,
+            myke_args.task_help_full,
+        ],
+    ):
         show_tui = yapx.utils.is_tui_available()
         myke_args.help = not show_tui
 
