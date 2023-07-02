@@ -17,7 +17,7 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
     "typing-extensions; python_version<'3.10'",
-    "yapx[shtab,rich]==0.2.0.dev42",
+    "yapx[extras]==0.2.*",
     "pip>=22.2",  # enables "pip --dry-run ..."
 ]
 
@@ -55,7 +55,6 @@ tests = [
     "pylint-pytest==1.*",
     "packaging==23.*",
     "mockish==0.1.*",
-    "yapx[pydantic]==0.2.0.dev42",
     #
     "requests==2.*",
     "pyyaml",
@@ -70,16 +69,12 @@ io = [
     "tomli; python_version<'3.11'",
     "tabulate",
 ]
-pydantic = [
-    "yapx[pydantic]==0.2.0.dev42",
-]
 extras = [
     "requests==2.*",
     "pyyaml",
     "python-dotenv",
     "tomli; python_version<'3.11'",
     "tabulate",
-    "yapx[pydantic]==0.2.0.dev42",
 ]
 
 [project.urls]

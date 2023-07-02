@@ -23,7 +23,7 @@ def test_main_version(capsys: CaptureFixture, version_pattern: Pattern):
     captured: CaptureResult = capsys.readouterr()
     assert not captured.err
     assert captured.out
-    assert version_pattern.search(captured.out), "invalid version"
+    assert version_pattern.search(captured.out.split()[-1]), "invalid version"
     assert pexit.value.code == 0
 
 
