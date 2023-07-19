@@ -10,14 +10,13 @@ from typing import Any, Callable, List, Optional, Union
 import yapx
 
 from .__version__ import __version__
-from .exceptions import NoTasksFoundError
+from .exceptions import NoTasksFoundError, TaskAlreadyRegisteredError
 from .globals import DEFAULT_MYKEFILE, MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS
 from .io.echo import echo
 from .io.write import write
 from .tasks import import_module, import_mykefile
 from .types import Annotated
 from .utils import get_repo_root
-from .exceptions import TaskAlreadyRegisteredError
 
 __all__ = ["__version__", "main", "sys"]
 
@@ -31,7 +30,7 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
                 default=_file if _file else None,
                 flags=["--myke-file"],
                 env="MYKE_FILE",
-                group="myke args",
+                group="myke parameters",
             ),
         ]
         module: Annotated[
@@ -40,14 +39,14 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
                 default=None,
                 flags=["--myke-module"],
                 env="MYKE_MODULE",
-                group="myke args",
+                group="myke parameters",
             ),
         ]
         list_tasks: Annotated[
             Optional[bool],
             yapx.arg(
                 default=None,
-                group="myke args",
+                group="myke parameters",
                 exclusive=True,
                 flags=["--myke-tasks"],
             ),
@@ -56,7 +55,7 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
             Optional[bool],
             yapx.arg(
                 default=None,
-                group="myke args",
+                group="myke parameters",
                 exclusive=True,
                 flags=["--myke-explain"],
             ),
@@ -65,7 +64,7 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
             Optional[bool],
             yapx.arg(
                 default=None,
-                group="myke args",
+                group="myke parameters",
                 exclusive=True,
                 flags=["--myke-create"],
             ),
