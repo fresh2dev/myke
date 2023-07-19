@@ -21,9 +21,9 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/fresh2dev/myke?color=blue&style=for-the-badge)](https://hub.docker.com/r/fresh2dev/myke)
 [![Docs Website](https://img.shields.io/website?down_message=unavailable&label=docs&style=for-the-badge&up_color=blue&up_message=available&url=https://www.f2dv.com/code/r/myke/i)](https://www.f2dv.com/code/r/myke/i)
 [![Coverage Website](https://img.shields.io/website?down_message=unavailable&label=coverage&style=for-the-badge&up_color=blue&up_message=available&url=https://www.f2dv.com/code/r/myke/i/tests/coverage)](https://www.f2dv.com/code/r/myke/i/tests/coverage)
-[![Funding](https://img.shields.io/badge/funding-%24%24%24-blue?style=for-the-badge)](https://www.f2dv.com/funding)
+[![Funding](https://img.shields.io/badge/funding-%24%24%24-blue?style=for-the-badge)](https://www.f2dv.com/fund)
 
----
+## Overview
 
 Meet `myke`, the dynamic Python CLI for task exection.
 
@@ -73,7 +73,7 @@ View available tasks:
 myke
 ```
 
-## Read More
+### Read More
 
 myke is an instantiation of the `yapx` project, the CLI builder for Python. The information contained in the [yapx docs](https://www.f2dv.com/code/r/yapx/i/) also applies to myke.
 
@@ -81,8 +81,12 @@ Read more about myke @ https://www.f2dv.com/code/r/myke/i
 
 Read more about yapx @ https://www.f2dv.com/code/r/yapx/i
 
+## Support
+
+If this project delivers value to you, please [provide feedback](https://www.github.com/fresh2dev/myke/issues), code contributions, and/or [funding](https://www.f2dv.com/fund).
+
 See all of my projects @ https://www.f2dv.com/code/r
 
 *Brought to you by...*
 
-<a href="https://www.fresh2.dev"><img src="https://img.fresh2.dev/fresh2dev.svg" style="filter: invert(50%);"></img></a>
+<a href="https://www.f2dv.com"><img src="https://img.fresh2.dev/fresh2dev.svg" style="filter: invert(50%);"></img></a>
