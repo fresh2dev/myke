@@ -185,7 +185,7 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
         root_task,
         named_subcommands=TASKS,
         args=task_args,
-        default_args=["--help"],
+        default_args=["--tui"],
         prog=prog,
         prog_version=__version__,
     )

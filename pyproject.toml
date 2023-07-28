@@ -7,7 +7,7 @@ name = "myke"
 authors = [
     {name = "Donald Mellenbruch", email = "hello@f2dv.com"},
 ]
-description = "The dynamic Python CLI for task execution."
+description = "The dynamic Python CLI for convenient task execution."
 readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.7"
@@ -17,7 +17,7 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
     "typing-extensions; python_version<'3.10'",
-    "yapx[extras]==0.2.*",
+    "yapx[extras]>=0.2.2,<1",
     "pip>=22.2",  # enables "pip --dry-run ..."
 ]
 
@@ -78,9 +78,9 @@ extras = [
 ]
 
 [project.urls]
-Homepage = "https://www.f2dv.com/code/r/myke/i"
+Homepage = "https://www.f2dv.com/r/myke"
 Repository = "https://www.github.com/fresh2dev/myke"
-Funding = "https://www.f2dv.com/funding"
+Funding = "https://www.f2dv.com/fund"
 
 [project.scripts]
 myke = "myke.__main__:main"
