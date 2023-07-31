@@ -14,7 +14,7 @@ license_type: GPLv3
 package_name: myke
 project_description: The dynamic Python CLI for convenient task execution.
 project_name: myke
-python_version: '3.7'
+python_version: '3.8'
 repo_mirror: https://www.f2dv.com/r/myke
 repo_name: fresh2dev/myke
 repo_owner: fresh2dev

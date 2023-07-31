@@ -10,7 +10,7 @@ authors = [
 description = "The dynamic Python CLI for convenient task execution."
 readme = "README.pypi.md"
 license = {file = "LICENSE"}
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
 ]
