@@ -60,21 +60,24 @@ tests = [
     "pyyaml",
     "python-dotenv",
     "tomli; python_version<'3.11'",
-    "tabulate",
+    "tabulate<1",
+    "ppqueue==0.4.*"
 ]
 io = [
     "requests==2.*",
     "pyyaml",
     "python-dotenv",
     "tomli; python_version<'3.11'",
-    "tabulate",
+    "tabulate<1",
+    "ppqueue==0.4.*"
 ]
 extras = [
     "requests==2.*",
     "pyyaml",
     "python-dotenv",
     "tomli; python_version<'3.11'",
-    "tabulate",
+    "tabulate<1",
+    "ppqueue==0.4.*"
 ]
 
 [project.urls]

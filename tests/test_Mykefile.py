@@ -6,7 +6,7 @@ from uuid import uuid4
 
 import pytest
 
-from myke import sh_stdout
+from myke import run, sh_stdout
 
 
 def _common(
@@ -144,6 +144,7 @@ def test_Mykefile_assert_types(capsys, resources_dir: str):
 def test_Mykefile_executable(capsys, resources_dir: str):
     # 1. ARRANGE
     mykefile: str = os.path.join(resources_dir, "Mykefile")
+    assert os.path.exists(mykefile)
 
     expected_txt: str = str(uuid4())
 
@@ -163,3 +164,13 @@ def test_Mykefile_executable(capsys, resources_dir: str):
     assert captured.out
     assert not captured.err
     assert expected_txt in captured.out
+
+
+def test_Mykefile_ppqueue(resources_dir: str):
+    mykefile: str = os.path.join(resources_dir, "Mykefile-ppqueue")
+    assert os.path.exists(mykefile)
+    _ = run(
+        f"""
+    PYTHONPATH=./src python -m myke --myke-file {mykefile} hello-again
+""",
+    )
