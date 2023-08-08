@@ -83,10 +83,6 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
 
     args = sys.argv[1:]
 
-    if not args:
-        parser.print_help()
-        parser.exit()
-
     myke_args: MykeArgs
     task_args: List[str]
     myke_args, task_args = parser.parse_known_args_to_model(

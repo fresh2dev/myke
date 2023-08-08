@@ -1,12 +1,36 @@
 # Changelog
 
+---
+
+## 0.3.0 - 2023-08-09
+
+### :clap: Features
+
+- Add `ppqueue` to extras [adf8695]
+
+### :point_right: Changes
+
+- *Breaking:* Require Python v3.8+ [f3c2982]
+- Run even when no args given [72dd9f7]
+
+SLOC Analysis:
+
+| Directory   |   Empty |   Comment |   Docstring |   Code |   Statements |
+|-------------|---------|-----------|-------------|--------|--------------|
+| src/myke    |     205 |        18 |         490 |    847 |          448 |
+| tests       |     204 |        39 |          52 |    438 |          368 |
+
+---
+
 ## 0.2.1 - 2023-07-28
 
 ### :metal: Other
 
 - bump: yapx>=0.2.2
 
-## [0.2.0] - 2023-07-19
+---
+
+## 0.2.0 - 2023-07-19
 
 ### :clap: Features
 
@@ -16,6 +40,8 @@
 
 - In help, "myke args" are now "myke parameters" [58d26da]
 - Depend on yapx[extras], including pydantic and textual [022c3f4]
+
+---
 
 ## 0.1.0 - 2023-06-07
 
