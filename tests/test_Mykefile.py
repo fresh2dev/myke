@@ -105,8 +105,10 @@ def test_Mykefile_hello_othermyke(capsys, resources_dir: str):
 def test_Mykefile_hello_check(capsys, resources_dir: str):
     cli_args: List[str] = ["hello-check"]
 
-    with pytest.raises(subprocess.CalledProcessError):
+    with pytest.raises(SystemExit) as e:
         _ = _common(capsys, resources_dir, cli_args=cli_args, expected_txt="...")
+
+    assert e.value.code == 123
 
 
 def test_Mykefile_hello_timeout(capsys, resources_dir: str):
@@ -127,15 +129,15 @@ def test_Mykefile_assert_types(capsys, resources_dir: str):
         "3.14",
         "--xbool",
         "--xliststr",
-        "list[this that]",
-        "list[another]",
+        "[this that]",
+        "[another]",
         "--xsetint",
-        "list[1 1]",
-        "list[1 2]",
-        "list[  3  ]",
+        "[1 1]",
+        "[1 2]",
+        "[  3  ]",
         "--xtuplefloat",
-        "list[3.14]",
-        "list[6.28 9.42]",
+        "[3.14]",
+        "[6.28 9.42]",
     ]
 
     _ = _common(capsys, resources_dir, cli_args=cli_args, expected_txt=None)
