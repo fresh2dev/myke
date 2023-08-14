@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from fnmatch import fnmatch
 from inspect import getsource
 from pathlib import Path
+from subprocess import CalledProcessError
 from typing import Any, Callable, List, Optional, Union
 
 import yapx
@@ -177,11 +178,21 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
             if not fnmatch(k, task_args[0]):
                 del TASKS[k]
 
-    yapx.run(
-        root_task,
-        named_subcommands=TASKS,
-        args=task_args,
-        default_args=["--tui"],
-        prog=prog,
-        prog_version=__version__,
-    )
+    try:
+        yapx.run(
+            root_task,
+            named_subcommands=TASKS,
+            args=task_args,
+            default_args=["--tui"],
+            prog=prog,
+            prog_version=__version__,
+        )
+    except CalledProcessError as e:
+        print(e)
+        if e.output:
+            print(f"stdout: {e.output}")
+        elif e.stderr:
+            print(f"stderr: {e.stderr}")
+        sys.exit(e.returncode)
+    except KeyboardInterrupt:
+        pass
