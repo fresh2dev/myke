@@ -32,16 +32,20 @@ def run(
     shell: bool | None = None,
     **kwargs: Any,
 ) -> subprocess.CompletedProcess[bytes | str]:
-    r"""
+    r"""Thin wrapper around `subprocess.run`
 
     Args:
-        args:
-        capture_output:
-        echo:
-        check:
-        env:
-        env_update:
-        shell:
+        args: ...
+        capture_output: ...
+        echo: ...
+        check: ...
+        env: ...
+        env_update: ...
+        shell: ...
+        **kwargs: passed to `subprocess.run(...)`
+
+    Returns:
+        ...
 
     Examples:
         >>> import myke
@@ -102,6 +106,13 @@ def run_stdout(*args: Any, **kwargs: Any) -> str:
 
     `myke.run(..., capture_output=True, text=True, echo=False).stdout.strip()`
 
+    Args:
+        *args: ...
+        **kwargs: ...
+
+    Returns:
+        ...
+
     Examples:
         >>> myke.run_stdout("echo 'Hello World.'")
         Hello World.
@@ -121,6 +132,13 @@ def run_stdout_lines(*args: Any, **kwargs: Any) -> list[str]:
 
     ...except that text is split on newlines and stripped of empty elements.
 
+    Args:
+        *args: ...
+        **kwargs: ...
+
+    Returns:
+        ...
+
     Examples:
         >>> myke.run_stdout("echo '   Hello World.   ' '  ' '   Goodbye World.   '")
         ['Hello World.', 'Goodbye World.']
@@ -130,19 +148,43 @@ def run_stdout_lines(*args: Any, **kwargs: Any) -> list[str]:
 
 @wraps(run)
 def sh(*args: Any, **kwargs: Any) -> subprocess.CompletedProcess[bytes | str]:
-    """Shorthand for: `myke.run(..., shell=True)`"""
+    """Shorthand for: `myke.run(..., shell=True)`
+
+    Args:
+        *args: ...
+        **kwargs: ...
+
+    Returns:
+        ...
+    """
     return run(*args, shell=True, **kwargs)
 
 
 @wraps(sh)
 def sh_stdout(*args: Any, **kwargs: Any) -> str:
-    """Shorthand for: `myke.run_stdout(..., shell=True)`"""
+    """Shorthand for: `myke.run_stdout(..., shell=True)`
+
+    Args:
+        *args: ...
+        **kwargs: ...
+
+    Returns:
+        ...
+    """
     return run_stdout(*args, shell=True, **kwargs)
 
 
 @wraps(sh)
 def sh_stdout_lines(*args: Any, **kwargs: Any) -> list[str]:
-    """Shorthand for: `myke.run_stdout_lines(..., shell=True)`"""
+    """Shorthand for: `myke.run_stdout_lines(..., shell=True)`
+
+    Args:
+        *args: ...
+        **kwargs: ...
+
+    Returns:
+        ...
+    """
     return run_stdout_lines(*args, shell=True, **kwargs)
 
 
@@ -182,9 +224,12 @@ def require(
 
     Args:
         *args: modules to require.
-        **kwargs: modules to require.
         pip_args: args passed to `pip`.
         skip_check: don't check if module is already installed.
+        **kwargs: modules to require.
+
+    Returns:
+        ...
 
     Examples:
         >>> import myke

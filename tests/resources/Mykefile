@@ -5,6 +5,7 @@ import os
 from typing import Dict, List, Optional, Set, Tuple
 
 from myke import arg, import_mykefile, main, shell_task, task
+from myke.types import Annotated
 
 
 @task(root=True)
@@ -29,22 +30,22 @@ def halo(name="world"):
 
 
 @task
-def x_hello_named2(name="world"):
+def hello_named2(name="world"):
     print("hello " + name)
 
 
 @task
-def x_hello_named3(name="world"):
+def hello_named3(name="world"):
     print("hello " + name)
 
 
 @task
-def x_hello_positional(name=arg("world", pos=True)):
+def hello_positional(name=arg(default="world", pos=True)):
     print("hello " + name)
 
 
 @task
-def x_hello_positional_bool(upper: bool = arg(default=False, pos=True)):
+def hello_positional_bool(upper: bool = arg(default=False, pos=True)):
     txt: str = "hello world"
     if upper:
         txt = txt.upper()
@@ -96,9 +97,9 @@ def assert_types(
     xint: int,
     xfloat: float,
     xbool: bool,
-    xliststr: List[str],
-    xsetint: Set[int],
-    xtuplefloat: Tuple[float, ...],
+    xliststr: Annotated[List[str], arg(nargs="+")],
+    xsetint: Annotated[Set[int], arg(nargs="+")],
+    xtuplefloat: Annotated[Tuple[float, ...], arg(nargs="+")],
 ) -> None:
     assert isinstance(xstr, str)
     assert isinstance(xint, int)

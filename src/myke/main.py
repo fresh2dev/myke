@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from fnmatch import fnmatch
 from inspect import getsource
 from pathlib import Path
+from subprocess import CalledProcessError
 from typing import Any, Callable, List, Optional, Union
 
 import yapx
@@ -27,8 +28,8 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
         file: Annotated[
             Optional[List[Path]],
             yapx.arg(
+                "myke-file",
                 default=_file if _file else None,
-                flags=["--myke-file"],
                 env="MYKE_FILE",
                 group="myke parameters",
             ),
@@ -36,8 +37,8 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
         module: Annotated[
             Optional[List[str]],
             yapx.arg(
+                "myke-module",
                 default=None,
-                flags=["--myke-module"],
                 env="MYKE_MODULE",
                 group="myke parameters",
             ),
@@ -45,28 +46,28 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
         list_tasks: Annotated[
             Optional[bool],
             yapx.arg(
+                "myke-tasks",
                 default=None,
                 group="myke parameters",
                 exclusive=True,
-                flags=["--myke-tasks"],
             ),
         ]
         explain: Annotated[
             Optional[bool],
             yapx.arg(
+                "myke-explain",
                 default=None,
                 group="myke parameters",
                 exclusive=True,
-                flags=["--myke-explain"],
             ),
         ]
         create: Annotated[
             Optional[bool],
             yapx.arg(
+                "myke-create",
                 default=None,
                 group="myke parameters",
                 exclusive=True,
-                flags=["--myke-create"],
             ),
         ]
 
@@ -78,6 +79,7 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
         help_flags=["--myke-help"],
         version_flags=["--myke-version"],
         completion_flags=[],
+        tui_flags=[],
     )
     parser.add_arguments(MykeArgs)
 
@@ -177,11 +179,21 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
             if not fnmatch(k, task_args[0]):
                 del TASKS[k]
 
-    yapx.run(
-        root_task,
-        named_subcommands=TASKS,
-        args=task_args,
-        default_args=["--tui"],
-        prog=prog,
-        prog_version=__version__,
-    )
+    try:
+        yapx.run(
+            root_task,
+            named_subcommands=TASKS,
+            args=task_args,
+            default_args=["--tui"],
+            prog=prog,
+            prog_version=__version__,
+        )
+    except CalledProcessError as e:
+        print(e)
+        if e.output:
+            print(f"stdout: {e.output}")
+        elif e.stderr:
+            print(f"stderr: {e.stderr}")
+        sys.exit(e.returncode)
+    except KeyboardInterrupt:
+        pass

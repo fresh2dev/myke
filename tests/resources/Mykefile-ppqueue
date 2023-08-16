@@ -6,7 +6,7 @@ from time import sleep
 
 from ppqueue import Queue
 
-from myke import task
+from myke import Context, task
 
 
 @task(root=True)
@@ -18,16 +18,16 @@ def setup():
 
 
 @task
-def hello(_relay_value: Queue):
-    queue = _relay_value
+def hello(_context: Context):
+    queue: Queue = _context.relay_value
     queue.put(sleep, 1)
     queue.wait()
 
 
 @task
-def hello_again(_relay_value: Queue):
-    queue = _relay_value
-    hello(queue)
+def hello_again(_context: Context):
+    queue: Queue = _context.relay_value
+    hello(_context)
     assert queue.size(finished=True) == 1
     queue.put(sleep, 1)
     assert queue.size() == 2

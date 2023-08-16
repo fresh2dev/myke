@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=64", "build==0.*", "wheel==0.*", "twine==4.*"]
+requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,7 +7,7 @@ name = "myke"
 authors = [
     {name = "Donald Mellenbruch", email = "hello@f2dv.com"},
 ]
-description = "The dynamic Python CLI for convenient task execution."
+description = "The dynamic Python CLI task runner."
 readme = "README.pypi.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.8"
@@ -17,11 +17,16 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
     "typing-extensions; python_version<'3.10'",
-    "yapx[extras]>=0.2.4,<1",
+    "yapx[extras]==0.3.*",
     "pip>=22.2",  # enables "pip --dry-run ..."
 ]
 
 [project.optional-dependencies]
+build = [
+    "build==0.*",
+    "wheel==0.*",
+    "twine==4.*",
+]
 dev = [
     "python-lsp-server[rope]==1.*",
     "pylint==2.*",

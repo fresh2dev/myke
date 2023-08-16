@@ -39,8 +39,11 @@ class read(str):
         Equivalent to: `Path(path).read_text().strip()`
 
         Args:
-            path:
-            encoding:
+            path: ...
+            encoding: ...
+
+        Returns:
+            ...
 
         Examples:
             >>> import myke
@@ -56,6 +59,13 @@ class read(str):
     def lines(cls, *args: str, **kwargs: str) -> List[str]:
         """Read lines from a text file, strip whitespace from each line, and return list of non-empty elements.
 
+        Args:
+            *args: ...
+            **kwargs: ...
+
+        Returns:
+            ...
+
         Examples:
             >>> import myke
             ...
@@ -70,6 +80,13 @@ class read(str):
     def json(cls, *args: str, **kwargs: str) -> Dict[str, Any]:
         """Parse object(s) from a JSON text file.
 
+        Args:
+            *args: ...
+            **kwargs: ...
+
+        Returns:
+            ...
+
         Examples:
             >>> import myke
             ...
@@ -83,6 +100,13 @@ class read(str):
     @wraps(text)
     def yaml(cls, *args: str, **kwargs: str) -> Dict[str, Any]:
         """Parse object(s) from a YAML text file.
+
+        Args:
+            *args: ...
+            **kwargs: ...
+
+        Returns:
+            ...
 
         Examples:
             >>> import myke
@@ -99,6 +123,13 @@ class read(str):
     @wraps(text)
     def yaml_all(cls, *args: str, **kwargs: str) -> List[Dict[str, Any]]:
         """Parse object(s) from multiple documents in a single YAML text file.
+
+        Args:
+            *args: ...
+            **kwargs: ...
+
+        Returns:
+            ...
 
         Examples:
             >>> import myke
@@ -120,6 +151,13 @@ class read(str):
     def toml(cls, *args: str, **kwargs: str) -> Dict[str, Any]:
         """Parse object(s) from a TOML text file.
 
+        Args:
+            *args: ...
+            **kwargs: ...
+
+        Returns:
+            ...
+
         Examples:
             >>> import myke
             ...
@@ -136,6 +174,13 @@ class read(str):
     @wraps(text)
     def cfg(cls, *args: str, **kwargs: str) -> Dict[str, Any]:
         """Parse object(s) from a INI/CFG text file.
+
+        Args:
+            *args: ...
+            **kwargs: ...
+
+        Returns:
+            ...
 
         Examples:
             >>> import myke
@@ -156,6 +201,13 @@ class read(str):
     def ini(cls, *args: str, **kwargs: str) -> Dict[str, Any]:
         """Parse object(s) from a INI/CFG text file.
 
+        Args:
+            *args: ...
+            **kwargs: ...
+
+        Returns:
+            ...
+
         Examples:
             >>> import myke
             ...
@@ -167,6 +219,13 @@ class read(str):
     @wraps(text)
     def dotfile(cls, *args: str, **kwargs: str) -> Dict[str, str]:
         """Parse key-value pairs from a dotfile (aka "envfile").
+
+        Args:
+            *args: ...
+            **kwargs: ...
+
+        Returns:
+            ...
 
         Examples:
             >>> import myke
@@ -185,6 +244,13 @@ class read(str):
     @wraps(dotfile)
     def envfile(cls, *args: str, **kwargs: str) -> Dict[str, str]:
         """Parse key-value pairs from a dotfile (aka "envfile").
+
+        Args:
+            *args: ...
+            **kwargs: ...
+
+        Returns:
+            ...
 
         Examples:
             >>> import myke
@@ -216,6 +282,9 @@ class read(str):
             addr: URL of the remote file.
             **kwargs: passed to `requests.request`
 
+        Returns:
+            ...
+
         Examples:
             >>> import myke
             ...
@@ -231,6 +300,9 @@ class read(str):
         Arguments:
             addr: URL of the remote file.
             **kwargs: passed to `requests.request`
+
+        Returns:
+            ...
 
         Examples:
             >>> import myke
