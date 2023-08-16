@@ -24,8 +24,8 @@ class echo:
         Equivalent to base `print` command; only exists for consistency.
 
         Arguments:
-            *args:
-            **kwargs:
+            *args: ...
+            **kwargs: ...
 
         Examples:
             >>> import myke
@@ -157,6 +157,7 @@ class echo:
         """Print a table of registered myke tasks.
 
         Args:
+            prog: ...
             tablefmt: table format to use (from `tabulate`)
 
         Examples:

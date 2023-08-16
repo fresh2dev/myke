@@ -37,15 +37,15 @@ class write:
         """Write text to a file.
 
         Args:
-            content:
-            path:
-            append:
-            overwrite:
-            encoding:
+            content: ...
+            path: ...
+            append: ...
+            overwrite: ...
+            encoding: ...
+            **kwargs: ...
 
         Raises:
             FileExistsError: if file exists and overwrite is False.
-
 
         Examples:
             >>> import myke
@@ -89,14 +89,14 @@ class write:
         """Write lines of text to a file.
 
         Args:
-            content:
-            path:
-            append:
-            overwrite:
+            content: ...
+            path: ...
+            append: ...
+            overwrite: ...
+            **kwargs: ...
 
         Raises:
             FileExistsError: if file exists and overwrite is False.
-
 
         Examples:
             >>> import myke
@@ -121,7 +121,7 @@ class write:
         """Create a new Mykefile.
 
         Args:
-            path:
+            path: ...
 
         Raises:
             FileExistsError: if file exists and overwrite is False.

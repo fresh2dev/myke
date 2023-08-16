@@ -2,15 +2,6 @@
 
 > The dynamic Python CLI task runner.
 
----
-
-<iframe src="https://www.f2dv.com/s/myke" frameborder="0" scrolling="no" style="height: 400px; width: 100%; border: none;"></iframe>
-
-- <a href="https://www.f2dv.com/s/myke" target="_blank">*View the Slides*</a>
-- <a href="https://www.f2dv.com/r/myke" target="_blank">*Read the Docs*</a>
-
----
-
 [![GitHub tag (with filter)](https://img.shields.io/github/v/tag/fresh2dev/myke?filter=!*%5Ba-z%5D*&style=for-the-badge&label=Release&color=blue)](https://www.f2dv.com/r/myke/changelog)
 [![GitHub last commit (branch)](https://img.shields.io/github/last-commit/fresh2dev/myke/main?style=for-the-badge&label=updated&color=blue)](https://www.f2dv.com/r/myke/changelog)
 [![GitHub Repo stars](https://img.shields.io/github/stars/fresh2dev/myke?color=blue&style=for-the-badge)](https://star-history.com/#fresh2dev/myke&Date)

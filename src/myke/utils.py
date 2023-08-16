@@ -45,7 +45,10 @@ def is_version(txt: str) -> bool:
     src: https://github.com/pypa/packaging/blob/main/packaging/version.py
 
     Args:
-        txt:
+        txt: ...
+
+    Returns:
+        ...
 
     Examples:
         >>> from myke.utils import is_version

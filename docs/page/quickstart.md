@@ -2,33 +2,27 @@
 
 There are some parameters specific to `myke`, each of them prefixed with `--myke-...` in order to not conflict with parameters of your own root-command.
 
-For example, to print help and print all registered tasks:
-
 ```sh
+________________________________________________________________________________
+
 $ myke --myke-help
+________________________________________________________________________________
 
-usage: myke [--myke-file FILE] [--myke-module MODULE] [--myke-help]
-            [--myke-explain] [--myke-create] [--myke-version]
+Helpful Parameters:
+  --myke-help           Show this help message.
+  --myke-help-all       Show help for all commands.
+  --myke-version        Show the program version number.
 
-myke args:
-  --myke-file FILE      > Type: Path, Default: None, Env: ['MYKE_FILE']
-  --myke-module MODULE  > Type: str, Default: 'mykefiles.python', Env:
-                        ['MYKE_MODULE']
-  --myke-help           > Type: bool, Default: None, M.X.
-  --myke-explain        > Type: bool, Default: None, M.X.
-  --myke-create         > Type: bool, Default: None, M.X.
-  --myke-version        > Type: bool, Default: None, M.X.
-
-===============  ================
-Task             Source
-===============  ================
-do-work          Mykefile
-more-work        Mykefile
-...
-===============  ================
-
-To view task parameters, see:
-> myke <task-name> --help
+Myke Parameters:
+  --myke-file <value>   > Type: Path], Env: ['MYKE_FILE']
+  --myke-module <value>
+                        > Type: List, Env: ['MYKE_MODULE']
+  --myke-tasks, --no-myke-tasks
+                        > Type: bool, M.X.
+  --myke-explain, --no-myke-explain
+                        > Type: bool, M.X.
+  --myke-create, --no-myke-create
+                        > Type: bool, M.X.
 ```
 
 ## Create a Mykefile
@@ -56,7 +50,7 @@ $ myke --myke-module my_package.my_module
 To print a task definition:
 
 ```sh
-$ myke --myke-explain <task-mame>
+$ myke --myke-explain <task-name>
 ```
 
 To list tasks that match glob pattern:

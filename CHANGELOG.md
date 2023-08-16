@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.0 - 2023-08-17
+
+### :clap: Features
+
+- *Breaking:* Yapx==0.3 [ff772b1]
+- Handle CalledProcessError and KeyboardInterrupt [fee658c]
+
+### :fist: Fixes
+
+- Suppress `--tui` from myke parser [bf8b9ac]
+
+SLOC Analysis:
+
+| Directory   |   Empty |   Comment |   Docstring |   Code |   Statements |
+|-------------|---------|-----------|-------------|--------|--------------|
+| src/myke    |     205 |        18 |         633 |    854 |          459 |
+| tests       |     208 |        39 |          52 |    440 |          370 |
+
 ---
 
 ## 0.3.0 - 2023-08-09
