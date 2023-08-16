@@ -79,6 +79,7 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
         help_flags=["--myke-help"],
         version_flags=["--myke-version"],
         completion_flags=[],
+        tui_flags=[],
     )
     parser.add_arguments(MykeArgs)
 
