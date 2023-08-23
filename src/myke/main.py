@@ -182,7 +182,7 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
     try:
         yapx.run(
             root_task,
-            named_subcommands=TASKS,
+            subcommands=[yapx.cmd(v, name=k) for k, v in TASKS.items()],
             args=task_args,
             default_args=["--tui"],
             prog=prog,
