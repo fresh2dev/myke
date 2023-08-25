@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1 - 2023-08-26
+
+### :clap: Features
+
+- Task parents [1e2af7e]
+- Yapx v0.4 [f5d6ee8]
+
 ## 0.4.0 - 2023-08-17
 
 ### :clap: Features
