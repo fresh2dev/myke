@@ -118,6 +118,12 @@ def test_Mykefile_hello_timeout(capsys, resources_dir: str):
         _ = _common(capsys, resources_dir, cli_args=cli_args, expected_txt="...")
 
 
+def test_Mykefile_hello_with_parent(capsys, resources_dir: str):
+    expected_txt = "charging lazer beamz\nhey!\nhello world\nho!\n"
+    cli_args: List[str] = ["parent-cmd", "hello-with-parent"]
+    _ = _common(capsys, resources_dir, cli_args=cli_args, expected_txt=expected_txt)
+
+
 def test_Mykefile_assert_types(capsys, resources_dir: str):
     cli_args: List[str] = [
         "assert-types",

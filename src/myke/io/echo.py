@@ -4,7 +4,8 @@ import collections.abc
 import os
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Union
 
-from ..globals import MYKE_VAR_NAME, TASKS
+from ..globals import MYKE_VAR_NAME
+from ..tasks import TASKS
 
 
 class echo:
@@ -172,15 +173,15 @@ class echo:
             ...     print(f"Goodbye {name}.")
             >>> myke.echo.tasks()
             <BLANKLINE>
-            ===========  ==========
-            Task         Source
-            ===========  ==========
-            say-goodbye  myke.tasks
-            say-hello    myke.tasks
-            ===========  ==========
+            =========  ===========  ==========
+            Parents    Task         Source
+            =========  ===========  ==========
+            -          say-goodbye  myke.tasks
+            -          say-hello    myke.tasks
+            =========  ===========  ==========
             <BLANKLINE>
             To view task parameters, see:
-            > myke <task-name> --help
+            $ myke <task-name> --help
             <BLANKLINE>
         """
         cls.text()
@@ -189,7 +190,16 @@ class echo:
             cls.text("No tasks found.")
         else:
             records: List[Dict[str, str]] = [
-                {"Task": k, "Source": v.__module__} for k, v in sorted(TASKS.items())
+                {
+                    "Parents": "-"
+                    if not x.parents
+                    else " > ".join(
+                        [p if isinstance(p, str) else p.name for p in x.parents],
+                    ),
+                    "Task": x.name,
+                    "Source": x.function.__module__,
+                }
+                for x in sorted(TASKS, key=lambda x: (x.parents, x.name))
             ]
 
             if not prog:
@@ -206,6 +216,6 @@ class echo:
 
             cls.text()
             cls.text("To view task parameters, see:")
-            cls.text(f"> {prog} <task-name> --help")
+            cls.text(f"$ {prog} <task-name> --help")
 
         cls.text()
