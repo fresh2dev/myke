@@ -4,7 +4,7 @@
 import os
 from typing import Dict, List, Optional, Set, Tuple
 
-from myke import arg, import_mykefile, main, shell_task, task
+from myke import arg, cmd, echo, import_mykefile, main, shell_task, task
 from myke.types import Annotated
 
 
@@ -111,6 +111,24 @@ def assert_types(
     assert isinstance(list(xsetint)[0], int)
     assert isinstance(xtuplefloat, tuple)
     assert isinstance(xtuplefloat[0], float)
+
+
+###
+
+
+def hello_parent():
+    echo("hey!")
+    yield
+    echo("ho!")
+
+
+@task(parents=cmd(hello_parent, name="parent-cmd"))
+def hello_with_parent(name: str = "world", upper: bool = False) -> None:
+    msg: str = f"hello {name}"
+    echo(msg.upper() if upper else msg)
+
+
+###
 
 
 dir_name: str = os.path.dirname(__name__)

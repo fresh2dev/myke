@@ -4,18 +4,31 @@ from __future__ import annotations
 
 import collections.abc
 import os
+from dataclasses import dataclass, field
 from functools import partial, wraps
 from subprocess import CompletedProcess
 from types import ModuleType
 from typing import Any, Callable, Sequence
 
-from .exceptions import NoTasksFoundError, TaskAlreadyRegisteredError
-from .globals import ROOT_TASK_KEY, TASKS
+import yapx
+
+from .exceptions import NoTasksFoundError
 from .run import sh
 from .utils import _MykeSourceFileLoader, convert_to_command_string
 
 
-def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
+@dataclass
+class Task:
+    name: str
+    function: Callable[..., Any]
+    parents: tuple[str | yapx.Command, ...] = field(default_factory=tuple)
+
+
+TASKS: list[Task] = []
+ROOT_TASK_KEY: str = "__root__"
+
+
+def add_tasks(*args: Callable[..., Any] | Task, **kwargs: Callable[..., Any]) -> None:
     """Register the given callable(s) with myke.
 
     Arguments:
@@ -36,23 +49,23 @@ def add_tasks(*args: Callable[..., Any], **kwargs: Callable[..., Any]) -> None:
         ...
         >>> myke.add_tasks(say_hello, say_goodbye)
     """
-    kwargs.update({x.__name__: x for x in args})
-
-    kwargs = {
-        (ROOT_TASK_KEY if k == ROOT_TASK_KEY else convert_to_command_string(k)): v
-        for k, v in kwargs.items()
-    }
-
-    for k, v in kwargs.items():
-        v_existing: Callable[..., Any] | None = TASKS.get(k, None)
-        if v_existing:
-            raise TaskAlreadyRegisteredError(
-                (
-                    f"Failed to import module '{v.__module__}': "
-                    f"Task '{k}' already defined from module '{v_existing.__module__}'"
-                ),
+    TASKS.extend(
+        [
+            x
+            if isinstance(x, Task)
+            else Task(name=convert_to_command_string(x.__name__), function=x)
+            for x in args
+        ],
+    )
+    TASKS.extend(
+        [
+            Task(
+                name=(k if k == ROOT_TASK_KEY else convert_to_command_string(k)),
+                function=v,
             )
-        TASKS[k] = v
+            for k, v in kwargs.items()
+        ],
+    )
 
 
 def import_mykefile(path: str) -> None:
@@ -105,13 +118,15 @@ def task(
     func: Callable[..., Any] | None = None,
     *,
     name: str | None = None,
-    root: bool | None = False,
+    parents: str | tuple[str | yapx.Command, ...] | None = None,
+    root: bool = False,
 ) -> Callable[..., Any] | Callable[..., Callable[..., Any]]:
     """Function decorator to register functions with myke.
 
     Args:
         func: ...
         name: name of the command.
+        parents: optional parent(s) for the command.
         root: if True, import this as the root command.
 
     Returns:
@@ -131,15 +146,23 @@ def task(
     """
 
     if not func:
-        return partial(task, name=name, root=root)
+        return partial(task, name=name, parents=parents, root=root)
 
     if root:
         name = ROOT_TASK_KEY
+    elif not name:
+        name = convert_to_command_string(func.__name__)
 
-    if name:
-        add_tasks(**{name: func})
-    else:
-        add_tasks(func)
+    if not parents:
+        parents = ()
+    elif isinstance(parents, (str, yapx.Command)):
+        parents = (parents,)
+    elif not isinstance(parents, tuple):
+        parents = tuple(parents)
+
+    new_task: Task = Task(name=name, function=func, parents=parents)
+
+    add_tasks(new_task)
 
     return func
 
@@ -148,6 +171,7 @@ def shell_task(
     func: Callable[..., str | Sequence[str]] | None = None,
     *,
     name: str | None = None,
+    parents: str | tuple[str] | None = None,
     root: bool | None = False,
     capture_output: bool | None = False,
     echo: bool | None = True,
@@ -169,6 +193,7 @@ def shell_task(
     Args:
         func: ...
         name: name of the command.
+        parents: optional parents for the command.
         root: if True, import this as the root command.
         capture_output: ...
         echo: ...
@@ -198,6 +223,7 @@ def shell_task(
         return partial(
             shell_task,
             name=name,
+            parents=parents,
             root=root,
             capture_output=capture_output,
             echo=echo,
@@ -235,11 +261,4 @@ def shell_task(
             executable=executable,
         )
 
-    if not name:
-        name = func.__name__
-
-    return task(_inner_func, name=name, root=root)
-
-
-# TODO: deprecate
-task_sh = shell_task
+    return task(_inner_func, name=name, parents=parents, root=root)

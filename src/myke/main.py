@@ -1,21 +1,21 @@
 import os
 import sys
+from collections import defaultdict
 from contextlib import suppress
 from dataclasses import dataclass
-from fnmatch import fnmatch
 from inspect import getsource
 from pathlib import Path
 from subprocess import CalledProcessError
-from typing import Any, Callable, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import yapx
 
 from .__version__ import __version__
 from .exceptions import NoTasksFoundError, TaskAlreadyRegisteredError
-from .globals import DEFAULT_MYKEFILE, MYKE_VAR_NAME, ROOT_TASK_KEY, TASKS
+from .globals import DEFAULT_MYKEFILE, MYKE_VAR_NAME
 from .io.echo import echo
 from .io.write import write
-from .tasks import import_module, import_mykefile
+from .tasks import ROOT_TASK_KEY, TASKS, Task, import_module, import_mykefile
 from .types import Annotated
 from .utils import get_repo_root
 
@@ -151,22 +151,27 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
     except TaskAlreadyRegisteredError as e:
         parser.error(str(e))
 
-    root_task: Optional[Callable[..., Any]] = TASKS.pop(ROOT_TASK_KEY, None)
+    root_task: Optional[Task] = None
+    root_tasks: List[Task] = [x for x in TASKS if x.name == ROOT_TASK_KEY]
+    if root_tasks:
+        root_task = root_tasks[0]
 
     if myke_args.explain:
-        explain_this: Optional[Callable[..., Any]] = None
+        explain_this: Optional[Task] = None
 
         if not task_args or task_args[0].startswith("-"):
             explain_this = root_task
             if explain_this is None:
                 echo("There is no root task. Provide a task name to explain.")
         else:
-            explain_this = TASKS.get(task_args[0], None)
-            if explain_this is None:
+            explain_this_list: List[Task] = [x for x in TASKS if x.name == task_args[0]]
+            if not explain_this_list:
                 echo(f"Given task name not found: {task_args[0]}")
+            else:
+                explain_this = explain_this_list[0]
 
         if explain_this:
-            echo(getsource(explain_this))
+            echo(getsource(explain_this.function))
 
         parser.exit()
 
@@ -174,15 +179,40 @@ def main(_file: Optional[Union[str, Path]] = None) -> None:
         echo.tasks(prog=prog)
         parser.exit()
 
-    if task_args and not task_args[0].startswith("--"):
-        for k in list(TASKS):
-            if not fnmatch(k, task_args[0]):
-                del TASKS[k]
+    task_parents: Dict[
+        Optional[Tuple[Union[str, yapx.Command], ...]],
+        List[yapx.Command],
+    ] = defaultdict(
+        list,
+    )
+    for x in TASKS:
+        task_parents[x.parents].append(yapx.cmd(x.function, x.name))
+
+    def defaultdict_recursive():
+        return defaultdict(defaultdict_recursive)
+
+    subcommands: yapx.CommandMap = defaultdict_recursive()
+
+    for parents_list, cmds_list in task_parents.items():
+        this_dict = subcommands
+
+        leaf_parent: Optional[Union[str, yapx.Command]] = None
+        if parents_list:
+            parent_cmds: List[yapx.Command] = [
+                yapx.cmd(None, name=x) if isinstance(x, str) else x
+                for x in parents_list
+            ]
+
+            leaf_parent = parent_cmds[-1]
+            for parent in parent_cmds[:-1]:
+                this_dict = this_dict[parent]
+
+        this_dict[leaf_parent] = cmds_list
 
     try:
         yapx.run(
-            root_task,
-            named_subcommands=TASKS,
+            None if root_task is None else root_task.function,
+            subcommands=subcommands,
             args=task_args,
             default_args=["--tui"],
             prog=prog,
